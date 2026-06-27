@@ -350,9 +350,91 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset })
         </div>
       </section>
 
-      <footer style={{ textAlign: 'center', padding: 26, fontSize: 12, color: 'var(--faint)', fontWeight: 500 }}>
-        SnapFit · Photos are processed locally and never uploaded. Not affiliated with any examination body.
+      {/* FAQ — targeted at search queries like "NEET photo size", "compress to 50kb" */}
+      <section style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(34px,5vw,58px) clamp(18px,5vw,56px)' }}>
+        <h2 style={{ fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 28px', textAlign: 'center' }}>
+          Frequently asked questions
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 780, margin: '0 auto' }}>
+          {[
+            {
+              q: 'What is the required photo size for NEET exam?',
+              a: 'NEET (NTA) requires a 200×230 pixel JPEG photo between 10 KB and 200 KB with a plain white background. Select the NEET preset in SnapFit and your photo is auto-cropped, background-swapped and compressed in one click.',
+            },
+            {
+              q: 'What photo size does UPSC CSE require?',
+              a: 'UPSC Civil Services requires a 350×350 pixel JPEG between 20 KB and 300 KB. The UPSC preset handles everything — dimensions, background and file size — automatically.',
+            },
+            {
+              q: 'How do I compress a photo to under 50 KB for SSC or IBPS?',
+              a: 'Upload your photo, pick the SSC CGL/CHSL or IBPS PO/Clerk preset, and SnapFit auto-reduces JPEG quality in steps until the output fits within the 20–50 KB range. No manual tuning needed.',
+            },
+            {
+              q: 'Can I change my photo background to white online?',
+              a: 'Yes — completely free. SnapFit detects the original background by sampling the four corners of your photo and replaces every matching pixel with the colour you choose (white, off-white or blue). Everything runs in your browser.',
+            },
+            {
+              q: 'What is the photo size for JEE Main / Advanced?',
+              a: 'JEE Main (NTA) requires 200×230 px, 10–200 KB, JPEG, white background — identical to NEET since both are NTA exams. Choose the JEE Main preset and download in seconds.',
+            },
+            {
+              q: 'Is my photo uploaded to any server?',
+              a: 'No. SnapFit uses the HTML5 Canvas API entirely in your browser. Your photo never leaves your device — there is no server, no account required, and no storage.',
+            },
+            {
+              q: 'Can I use a custom photo size not in the preset list?',
+              a: 'Yes. Choose the Custom preset and enter your own width (px), height (px), minimum KB and maximum KB. SnapFit will resize and compress to exactly those specs.',
+            },
+            {
+              q: 'What photo format do Indian competitive exams require?',
+              a: 'Nearly all Indian exams — NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, NDA, AFCAT, CTET — require JPEG (JPG) format. SnapFit always produces a JPEG output and auto-compresses it to the KB target of the chosen exam.',
+            },
+          ].map(({ q, a }, i) => (
+            <FaqItem key={i} q={q} a={a} />
+          ))}
+        </div>
+      </section>
+
+      <footer style={{ borderTop: '1px solid var(--line)', padding: '28px clamp(18px,5vw,56px)', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontSize: 12, color: 'var(--faint)', fontWeight: 500 }}>
+          © 2026 SnapFit · Photos processed locally, never uploaded · Not affiliated with NTA, UPSC, SSC or any examination body.
+        </div>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          {['NEET', 'JEE', 'UPSC', 'SSC', 'IBPS', 'RRB', 'GATE', 'NDA', 'Passport'].map(tag => (
+            <span key={tag} style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--faint)' }}>{tag} photo</span>
+          ))}
+        </div>
       </footer>
+    </div>
+  )
+}
+
+function FaqItem({ q, a }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
+          padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          fontFamily: 'inherit', fontWeight: 700, fontSize: 14.5, color: 'var(--ink)',
+        }}
+      >
+        <span>{q}</span>
+        <svg
+          width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="var(--green)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0, transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{ padding: '0 20px 16px', fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.65, borderTop: '1px solid var(--line)' }}>
+          {a}
+        </div>
+      )}
     </div>
   )
 }

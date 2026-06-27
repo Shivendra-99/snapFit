@@ -1,10 +1,144 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SnapFit — Exam Photo Fixer</title>
+
+    <!-- ── Primary SEO ──────────────────────────────────────────────────── -->
+    <title>SnapFit – Free Exam Photo Resizer | NEET, JEE, UPSC, SSC, IBPS & More</title>
+    <meta name="description" content="Resize, compress and fix your exam photo for NEET, JEE, UPSC, SSC, IBPS, RRB, GATE and 20+ Indian competitive exams — free, instant, 100% in your browser. No uploads, no sign-up." />
+    <meta name="keywords" content="exam photo resize, NEET photo size, JEE photo resize, UPSC photo compress, SSC photo size, IBPS photo resize, RRB photo, GATE photo, exam photo background change, passport size photo online, compress photo to 50kb, photo resize for exam, exam photo maker India" />
+    <meta name="author" content="SnapFit" />
+    <link rel="canonical" href="https://snapfit.in/" />
+
+    <!-- ── Open Graph (Facebook / WhatsApp) ────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://snapfit.in/" />
+    <meta property="og:title"       content="SnapFit – Free Exam Photo Resizer for NEET, JEE, UPSC, SSC & More" />
+    <meta property="og:description" content="Auto-crop, change background and compress to the exact KB your exam demands. Supports NEET, JEE, UPSC, SSC, IBPS, RRB, GATE and 20+ exams. Free & private." />
+    <meta property="og:image"       content="https://snapfit.in/og-image.png" />
+    <meta property="og:locale"      content="en_IN" />
+    <meta property="og:site_name"   content="SnapFit" />
+
+    <!-- ── Twitter / X card ─────────────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="SnapFit – Free Exam Photo Resizer" />
+    <meta name="twitter:description" content="Fix your exam photo for NEET, JEE, UPSC, SSC, IBPS and 20+ exams. Resize, background swap, KB compress — all in your browser." />
+    <meta name="twitter:image"       content="https://snapfit.in/og-image.png" />
+
+    <!-- ── Robots & indexing ─────────────────────────────────────────────── -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- ── Structured data — WebApplication ─────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "SnapFit Exam Photo Fixer",
+      "url": "https://snapfit.in/",
+      "description": "Free online tool to resize, compress and adjust exam photos for NEET, JEE, UPSC, SSC, IBPS, RRB, GATE and 20+ Indian competitive exams. Works entirely in the browser.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "featureList": [
+        "Auto-crop to exact exam dimensions",
+        "Background colour replacement",
+        "Auto-compress to target KB range",
+        "20+ exam presets (NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, Passport)",
+        "Custom width, height and size",
+        "100% client-side — no photo upload"
+      ],
+      "screenshot": "https://snapfit.in/og-image.png",
+      "inLanguage": "en-IN",
+      "availableOnDevice": ["Desktop", "Mobile", "Tablet"]
+    }
+    </script>
+
+    <!-- ── Structured data — FAQ ──────────────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the required photo size for NEET exam?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "NEET (NTA) requires a 200×230 pixel JPEG photo between 10 KB and 200 KB with a white background. SnapFit auto-resizes and compresses your photo to meet these exact requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What photo size does UPSC CSE require?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "UPSC Civil Services Exam requires a 350×350 pixel JPEG photo between 20 KB and 300 KB. SnapFit applies these dimensions automatically when you select the UPSC preset."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I compress my photo to under 50 KB for SSC or IBPS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Upload your photo to SnapFit, select the SSC or IBPS preset, and the tool automatically compresses the output JPEG to fit within the 20–50 KB range required by these exams — no manual setting needed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change my photo background to white online for free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. SnapFit includes a built-in background replacement tool. It samples the original background colour from the corners of your photo and replaces it with white (or blue/off-white) — entirely in your browser, for free."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my photo uploaded to any server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. SnapFit processes everything locally in your browser using the HTML5 Canvas API. Your photo never leaves your device and is never sent to any server."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What photo format do Indian competitive exams require?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Almost all Indian competitive exams (NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, etc.) require a JPEG (JPG) photo. SnapFit always outputs a JPEG and automatically compresses it to the KB range specified by your chosen exam."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the photo size for JEE Main?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "JEE Main (NTA) requires a 200×230 pixel JPEG between 10 KB and 200 KB with a white background. Use the JEE Main preset in SnapFit to get a correctly sized and compressed photo in seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use a custom photo size not listed in the presets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Select the 'Custom' preset in SnapFit and enter your own width, height, minimum KB and maximum KB. The tool will resize and compress your photo to exactly those specifications."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- ── Favicon & PWA ──────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#15803d" />
+
+    <!-- ── Fonts ──────────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
