@@ -1,0 +1,141 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ---- Theme variables ---- */
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f4f6f0;
+  color: #16241b;
+  --surface: #ffffff;
+  --surface2: #f0f4ee;
+  --tint: #eaf6ee;
+  --ink: #16241b;
+  --muted: #5a7a65;
+  --faint: #8aa095;
+  --line: rgba(0, 0, 0, 0.09);
+  --green: #15803d;
+  --green-ink: #15803d;
+  --navbg: rgba(244, 246, 240, 0.88);
+}
+
+.shell.dark {
+  background: #0e1611;
+  color: #e9f1ec;
+  --surface: #161f19;
+  --surface2: #1e2a22;
+  --tint: #18271d;
+  --ink: #e9f1ec;
+  --muted: #a3b4a8;
+  --faint: #7c8d81;
+  --line: rgba(255, 255, 255, 0.10);
+  --green: #34a663;
+  --green-ink: #7fd29a;
+  --navbg: rgba(14, 22, 17, 0.82);
+}
+
+/* ---- Animations ---- */
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes pulsering {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(21, 128, 61, 0); }
+}
+
+/* ---- Preset cards (hover handled in CSS) ---- */
+.preset-card {
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 6px 18px -12px rgba(22, 36, 27, 0.3);
+  transition: transform 0.15s;
+}
+.preset-card:hover { transform: translateY(-3px); }
+
+/* ---- Upload drop area ---- */
+.upload-area {
+  cursor: pointer;
+  background: var(--surface);
+  border: 2px dashed rgba(21, 128, 61, 0.4);
+  border-radius: 24px;
+  padding: clamp(30px, 5vw, 46px) 28px;
+  text-align: center;
+  box-shadow: 0 20px 50px -22px rgba(22, 36, 27, 0.28);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Range inputs ---- */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--green);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+  border: none;
+}
+
+/* ---- Custom dimension number inputs ---- */
+.custom-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.custom-input:focus {
+  border-color: #6d28d9;
+}
+.custom-input::-webkit-inner-spin-button,
+.custom-input::-webkit-outer-spin-button {
+  opacity: 0.5;
+}
