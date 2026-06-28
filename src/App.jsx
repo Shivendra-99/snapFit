@@ -628,25 +628,16 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
               onClick={() => onSelectPreset(p)}
               style={p.id === 'custom' ? { borderStyle: 'dashed', borderColor: p.ink, opacity: 0.9 } : {}}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ marginBottom: 12 }}>
                 <div style={{
-                  width: 38, height: 38, borderRadius: 11, background: p.tint,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 800, fontSize: p.id === 'custom' ? 20 : 13, color: p.ink,
+                  width: 36, height: 36, borderRadius: 10, background: p.tint,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 800, fontSize: p.id === 'custom' ? 18 : 11.5, color: p.ink, letterSpacing: '-.01em',
                 }}>{p.abbr}</div>
-                {p.id !== 'custom' && (
-                  <div style={{ width: 26, height: 32, borderRadius: 4, background: '#ffffff', border: '1.5px solid var(--line)' }} />
-                )}
               </div>
-              <div style={{ fontWeight: 800, fontSize: p.name.length > 18 ? 12 : 15, letterSpacing: '-.01em', marginBottom: 3, lineHeight: 1.3 }}>{p.name}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', fontFamily: "'JetBrains Mono',monospace" }}>
-                {p.id === 'custom' ? 'any size · any KB' : `${p.w}×${p.h} px`}
-              </div>
-              <div style={{
-                fontSize: 11.5, fontWeight: 600, color: p.ink, background: p.tint,
-                display: 'inline-block', padding: '3px 8px', borderRadius: 6, marginTop: 10,
-              }}>
-                {p.id === 'custom' ? 'fully custom' : `${p.min}–${p.max} KB`}
+              <div style={{ fontWeight: 800, fontSize: p.name.length > 18 ? 11.5 : 14.5, letterSpacing: '-.01em', marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', fontFamily: "'JetBrains Mono',monospace", marginBottom: 8 }}>
+                {p.id === 'custom' ? 'any size · any KB' : `${p.w}×${p.h} px · ${p.min}–${p.max} KB`}
               </div>
             </div>
           ))}
