@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import './index.css'
+import * as pdfjsLib from 'pdfjs-dist'
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).href
 
 // ─── Preset groups ────────────────────────────────────────────────────────────
 // G = colour group: green | orange | blue | navy | purple
@@ -12,36 +17,28 @@ const G = {
 }
 
 const PRESETS = [
-  // ── Medical / Engineering ──────────────────────────────────────────────
-  { id: 'neet',   name: 'NEET UG',          abbr: 'NEET', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green  },
-  { id: 'jee',    name: 'JEE Main / Adv.',  abbr: 'JEE',  w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green  },
-  { id: 'gate',   name: 'GATE',             abbr: 'GATE', w: 240, h: 320, bg: '#ffffff', min: 5,   max: 200, ...G.green  },
-  { id: 'cuet',   name: 'CUET UG/PG',       abbr: 'CUET', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.blue   },
-  { id: 'cat',    name: 'CAT (IIM)',         abbr: 'CAT',  w: 100, h: 130, bg: '#ffffff', min: 10,  max: 50,  ...G.blue   },
-  // ── Civil Services ────────────────────────────────────────────────────
-  { id: 'upsc',   name: 'UPSC CSE',         abbr: 'UPSC', w: 350, h: 350, bg: '#ffffff', min: 20,  max: 300, ...G.green  },
-  { id: 'ugcnet', name: 'UGC NET / SET',    abbr: 'NET',  w: 200, h: 230, bg: '#ffffff', min: 10,  max: 100, ...G.green  },
-  { id: 'bpsc',   name: 'BPSC',             abbr: 'BPSC', w: 215, h: 265, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
-  { id: 'tnpsc',  name: 'TNPSC',            abbr: 'TN',   w: 150, h: 200, bg: '#ffffff', min: 10,  max: 40,  ...G.orange },
-  { id: 'mpsc',   name: 'MPSC / UPPSC',     abbr: 'PSC',  w: 200, h: 230, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
-  // ── Staff Selection ───────────────────────────────────────────────────
-  { id: 'ssc',    name: 'SSC CGL / CHSL',   abbr: 'SSC',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange },
-  { id: 'ctet',   name: 'CTET / DSSSB',     abbr: 'CTET', w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange },
-  // ── Banking & Finance ─────────────────────────────────────────────────
-  { id: 'ibps',   name: 'IBPS PO / Clerk',  abbr: 'IBPS', w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.blue   },
-  { id: 'sbi',    name: 'SBI PO / Clerk',   abbr: 'SBI',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.blue   },
-  { id: 'rbi',    name: 'RBI Grade B',       abbr: 'RBI',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.blue   },
-  { id: 'lic',    name: 'LIC AAO / ADO',    abbr: 'LIC',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.blue   },
-  // ── Railway ───────────────────────────────────────────────────────────
-  { id: 'rrb',    name: 'RRB / NTPC',       abbr: 'RRB',  w: 130, h: 160, bg: '#ffffff', min: 15,  max: 40,  ...G.orange },
-  // ── Defence ───────────────────────────────────────────────────────────
-  { id: 'nda',    name: 'NDA / CDS',        abbr: 'NDA',  w: 200, h: 240, bg: '#ffffff', min: 20,  max: 50,  ...G.navy   },
-  { id: 'afcat',  name: 'AFCAT',            abbr: 'AF',   w: 200, h: 240, bg: '#ffffff', min: 10,  max: 50,  ...G.navy   },
+  // ── 200×230, 10–200 KB  (NEET / JEE / CUET share identical specs) ────
+  { id: 'neet',   name: 'NEET, JEE, CUET',                    abbr: 'NEET+', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green  },
+  // ── 200×230, 10–100 KB ───────────────────────────────────────────────
+  { id: 'ugcnet', name: 'UGC NET / SET',                       abbr: 'NET',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 100, ...G.green  },
+  // ── 200×230, 10–50 KB ────────────────────────────────────────────────
+  { id: 'mpsc',   name: 'MPSC / UPPSC',                        abbr: 'PSC',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
+  // ── 200×230, 20–50 KB  (SSC / CTET / Banking share identical specs) ──
+  { id: 'ssc',    name: 'SSC, CTET, IBPS, SBI, RBI, LIC',     abbr: 'SSC+',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange },
+  // ── Others – unique dimensions ────────────────────────────────────────
+  { id: 'gate',   name: 'GATE',                                abbr: 'GATE',  w: 240, h: 320, bg: '#ffffff', min: 5,   max: 200, ...G.green  },
+  { id: 'cat',    name: 'CAT (IIM)',                           abbr: 'CAT',   w: 100, h: 130, bg: '#ffffff', min: 10,  max: 50,  ...G.blue   },
+  { id: 'upsc',   name: 'UPSC CSE',                           abbr: 'UPSC',  w: 350, h: 350, bg: '#ffffff', min: 20,  max: 300, ...G.green  },
+  { id: 'bpsc',   name: 'BPSC',                               abbr: 'BPSC',  w: 215, h: 265, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
+  { id: 'tnpsc',  name: 'TNPSC',                              abbr: 'TN',    w: 150, h: 200, bg: '#ffffff', min: 10,  max: 40,  ...G.orange },
+  { id: 'rrb',    name: 'RRB / NTPC',                         abbr: 'RRB',   w: 130, h: 160, bg: '#ffffff', min: 15,  max: 40,  ...G.orange },
+  // ── 200×240, 10–50 KB  (NDA / CDS / AFCAT near-identical) ───────────
+  { id: 'nda',    name: 'NDA, CDS, AFCAT',                    abbr: 'NDA+',  w: 200, h: 240, bg: '#ffffff', min: 10,  max: 50,  ...G.navy   },
   // ── ID Documents ─────────────────────────────────────────────────────
-  { id: 'pass',   name: 'Passport 35×45',   abbr: 'PP',   w: 413, h: 531, bg: '#ffffff', min: 20,  max: 100, ...G.orange },
-  { id: 'visa',   name: 'US Visa 2×2"',     abbr: 'VISA', w: 600, h: 600, bg: '#ffffff', min: 100, max: 240, ...G.navy   },
+  { id: 'pass',   name: 'Passport 35×45',                     abbr: 'PP',    w: 413, h: 531, bg: '#ffffff', min: 20,  max: 100, ...G.orange },
+  { id: 'visa',   name: 'US Visa 2×2"',                       abbr: 'VISA',  w: 600, h: 600, bg: '#ffffff', min: 100, max: 240, ...G.navy   },
   // ── Custom ────────────────────────────────────────────────────────────
-  { id: 'custom', name: 'Custom',            abbr: '✎',    w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.purple },
+  { id: 'custom', name: 'Custom',                              abbr: '✎',     w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.purple },
 ]
 
 const CUSTOM_BASE = PRESETS.find(p => p.id === 'custom')
@@ -88,8 +85,314 @@ function kbOf(url) {
   return Math.max(1, Math.round((url.split(',')[1] || '').length * 0.75 / 1024))
 }
 
+// ─── PDF Compressor ───────────────────────────────────────────────────────────
+function fmtKb(kb) {
+  return kb >= 1000 ? `${(kb / 1024).toFixed(2)} MB` : `${kb} KB`
+}
+
+function PdfScreen({ onBack }) {
+  const [pdfDoc,    setPdfDoc]    = useState(null)
+  const [fileName,  setFileName]  = useState('')
+  const [origKb,    setOrigKb]    = useState(0)
+  const [pages,     setPages]     = useState(0)
+  const [quality,   setQuality]   = useState(70)
+  const [origPrev,  setOrigPrev]  = useState(null)
+  const [compPrev,  setCompPrev]  = useState(null)
+  const [compKb,    setCompKb]    = useState(0)
+  const [pdfBlob,   setPdfBlob]   = useState(null)
+  const [busy,      setBusy]      = useState(false)
+
+  const fileRef  = useRef(null)
+  const docRef   = useRef(null)
+  const timerRef = useRef(null)
+
+  // ── Core compression routine ─────────────────────────────────────────
+  const compress = useCallback(async (doc, q) => {
+    setBusy(true)
+    try {
+      const jq = 0.3 + (q / 100) * 0.65   // JPEG quality: 0.30 → 0.95
+      const sc = 0.5 + (q / 100) * 1.0    // render scale: 0.50 → 1.50
+
+      // Compressed preview of first page
+      const p1   = await doc.getPage(1)
+      const vpC  = p1.getViewport({ scale: sc })
+      const cvC  = Object.assign(document.createElement('canvas'), { width: vpC.width, height: vpC.height })
+      await p1.render({ canvasContext: cvC.getContext('2d'), viewport: vpC }).promise
+      setCompPrev(cvC.toDataURL('image/jpeg', jq))
+
+      // Build compressed PDF (all pages)
+      const { jsPDF } = await import('jspdf')
+      let pdf = null
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i)
+        const vo   = page.getViewport({ scale: 1 })   // original dimensions
+        const vr   = page.getViewport({ scale: sc })   // render dimensions
+
+        if (i === 1) {
+          pdf = new jsPDF({
+            unit: 'px',
+            format: [vo.width, vo.height],
+            orientation: vo.width > vo.height ? 'l' : 'p',
+            compress: true,
+          })
+        } else {
+          pdf.addPage([vo.width, vo.height], vo.width > vo.height ? 'l' : 'p')
+        }
+
+        const cv = Object.assign(document.createElement('canvas'), { width: vr.width, height: vr.height })
+        await page.render({ canvasContext: cv.getContext('2d'), viewport: vr }).promise
+        pdf.addImage(cv.toDataURL('image/jpeg', jq), 'JPEG', 0, 0, vo.width, vo.height, '', 'FAST')
+      }
+
+      const blob = pdf.output('blob')
+      setPdfBlob(blob)
+      setCompKb(Math.round(blob.size / 1024))
+    } catch (err) {
+      console.error('PDF compress error', err)
+    } finally {
+      setBusy(false)
+    }
+  }, [])
+
+  // ── Load PDF file ─────────────────────────────────────────────────────
+  const loadFile = useCallback(async (file) => {
+    if (!file?.type?.includes('pdf')) return
+    setBusy(true)
+    setFileName(file.name)
+    setOrigKb(Math.round(file.size / 1024))
+    try {
+      const doc = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise
+      docRef.current = doc
+      setPdfDoc(doc)
+      setPages(doc.numPages)
+
+      // High-quality preview of page 1 (fixed, for "before" side)
+      const pg  = await doc.getPage(1)
+      const vp  = pg.getViewport({ scale: 1.5 })
+      const cv  = Object.assign(document.createElement('canvas'), { width: vp.width, height: vp.height })
+      await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise
+      setOrigPrev(cv.toDataURL('image/jpeg', 0.95))
+
+      await compress(doc, quality)
+    } catch (err) {
+      console.error('PDF load error', err)
+      setBusy(false)
+    }
+  }, [quality, compress])
+
+  // ── Slider handler with debounce ─────────────────────────────────────
+  const handleSlider = (val) => {
+    setQuality(val)
+    clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      if (docRef.current) compress(docRef.current, val)
+    }, 400)
+  }
+
+  useEffect(() => () => clearTimeout(timerRef.current), [])
+
+  const download = () => {
+    if (!pdfBlob) return
+    const url = URL.createObjectURL(pdfBlob)
+    Object.assign(document.createElement('a'), { href: url, download: `compressed_${fileName}` }).click()
+    URL.revokeObjectURL(url)
+  }
+
+  const savings  = origKb > 0 ? Math.round((1 - compKb / origKb) * 100) : 0
+  const savColor = savings >= 40 ? '#16a34a' : savings >= 15 ? '#c4730e' : '#64748b'
+
+  // ── Upload screen (no PDF loaded yet) ────────────────────────────────
+  if (!pdfDoc) {
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(24px,5vw,60px) clamp(18px,5vw,56px)' }}>
+        <input ref={fileRef} type="file" accept=".pdf,application/pdf" onChange={e => loadFile(e.target.files?.[0])} style={{ display: 'none' }} />
+        <div style={{ textAlign: 'center', maxWidth: 520, width: '100%' }}>
+          <button onClick={onBack} style={{
+            border: '1px solid var(--line)', background: 'var(--surface)', cursor: 'pointer',
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, color: 'var(--ink)',
+            padding: '9px 15px', borderRadius: 11, display: 'inline-flex', alignItems: 'center', gap: 7, marginBottom: 36,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+            Back to photo tool
+          </button>
+
+          <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--tint)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', fontSize: 30 }}>📄</div>
+          <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 10 }}>PDF Compressor</h1>
+          <p style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
+            Reduce PDF file size with a quality slider — see the before &amp; after preview before you download. 100% in your browser, nothing uploaded.
+          </p>
+
+          <div
+            className="upload-area"
+            onClick={() => fileRef.current?.click()}
+            onDrop={e => { e.preventDefault(); loadFile(e.dataTransfer.files?.[0]) }}
+            onDragOver={e => e.preventDefault()}
+          >
+            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 80% at 50% -10%,var(--tint) 0%,transparent 60%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ width: 64, height: 64, margin: '0 auto 16px', borderRadius: 18, background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'floaty 3.4s ease-in-out infinite', boxShadow: '0 10px 24px rgba(21,128,61,.34)' }}>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 15V3M8 7l4-4 4 4" /><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+                </svg>
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Drop your PDF here</div>
+              <div style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 500, marginBottom: 18 }}>or click to browse</div>
+              <span style={{ display: 'inline-block', background: 'var(--tint)', color: 'var(--green)', fontWeight: 700, fontSize: 13.5, padding: '11px 22px', borderRadius: 11, animation: 'pulsering 2.4s infinite' }}>Choose PDF</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Main editor ───────────────────────────────────────────────────────
+  return (
+    <div style={{ flex: 1, maxWidth: 1180, width: '100%', margin: '0 auto', padding: 'clamp(18px,3vw,30px) clamp(16px,5vw,40px) 50px', animation: 'fadeup .35s ease both' }}>
+
+      {/* Top bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24 }}>
+        <button onClick={onBack} style={{ border: '1px solid var(--line)', background: 'var(--surface)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, color: 'var(--ink)', padding: '9px 15px', borderRadius: 11, display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+          Back
+        </button>
+        <div style={{ fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ color: 'var(--muted)', fontWeight: 600, fontSize: 13 }}>PDF Compressor</span>
+          {pages} page{pages > 1 ? 's' : ''}
+        </div>
+        <button onClick={() => { setPdfDoc(null); setPdfBlob(null); setOrigPrev(null); setCompPrev(null) }} style={{ border: '1px solid var(--line)', background: 'var(--surface)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, color: 'var(--ink)', padding: '9px 15px', borderRadius: 11 }}>
+          Replace
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-start' }}>
+
+        {/* PREVIEW PANEL */}
+        <div style={{ flex: '1 1 380px', minWidth: 300 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 22, padding: 'clamp(18px,3vw,28px)', boxShadow: '0 12px 34px -20px rgba(22,36,27,.3)' }}>
+            <div style={{ display: 'flex', gap: 18, justifyContent: 'center', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+              {/* Original */}
+              <div style={{ textAlign: 'center', flex: '1 1 140px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>Original · {fmtKb(origKb)}</div>
+                <div style={{ background: 'var(--surface2)', borderRadius: 10, padding: 6, display: 'inline-block', width: '100%' }}>
+                  {origPrev && <img src={origPrev} alt="Original page 1" style={{ display: 'block', width: '100%', borderRadius: 6, objectFit: 'contain' }} />}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center', color: 'var(--faint)', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </div>
+
+              {/* Compressed */}
+              <div style={{ textAlign: 'center', flex: '1 1 140px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>
+                  {quality}% quality · {fmtKb(compKb)}
+                </div>
+                <div style={{ background: 'var(--tint)', borderRadius: 10, padding: 6, display: 'inline-block', width: '100%', boxShadow: '0 0 0 2px rgba(21,128,61,.18)', position: 'relative' }}>
+                  {compPrev && <img src={compPrev} alt="Compressed page 1" style={{ display: 'block', width: '100%', borderRadius: 6, objectFit: 'contain' }} />}
+                  {busy && (
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 6, background: 'rgba(0,0,0,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ color: '#fff', fontSize: 12, fontWeight: 700 }}>Updating…</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Size summary row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--line)' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--surface2)', padding: '8px 14px', borderRadius: 10 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--muted)' }}>{fmtKb(origKb)}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink)' }}>{fmtKb(compKb)}</span>
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--tint)', padding: '8px 14px', borderRadius: 10 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 99, background: savColor, display: 'inline-block' }} />
+                <span style={{ fontSize: 12.5, fontWeight: 800, color: savColor }}>{savings}% smaller</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Download button */}
+          <button
+            onClick={download}
+            disabled={busy || !pdfBlob}
+            style={{ width: '100%', marginTop: 14, border: 'none', cursor: busy ? 'not-allowed' : 'pointer', background: busy ? 'var(--line)' : 'var(--green)', color: '#fff', fontFamily: 'inherit', fontWeight: 800, fontSize: 15, padding: 16, borderRadius: 14, boxShadow: busy ? 'none' : '0 10px 24px rgba(21,128,61,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'background .2s' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 4v12M7 11l5 5 5-5" /><path d="M5 20h14" />
+            </svg>
+            {busy ? 'Processing…' : `Download compressed PDF (${fmtKb(compKb)})`}
+          </button>
+        </div>
+
+        {/* CONTROLS PANEL */}
+        <div style={{ flex: '0 1 300px', minWidth: 260, display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          {/* File info */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
+              File info
+            </div>
+            {[
+              { label: 'File',     val: fileName.length > 24 ? fileName.slice(0, 22) + '…' : fileName },
+              { label: 'Pages',    val: pages },
+              { label: 'Original', val: fmtKb(origKb) },
+            ].map(({ label, val }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 7, alignItems: 'baseline' }}>
+                <span style={{ fontWeight: 600, color: 'var(--muted)' }}>{label}</span>
+                <span style={{ fontWeight: 700, color: 'var(--ink)', fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>{val}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Quality slider */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
+              Quality
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+              <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600 }}>Compression level</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 20, color: 'var(--green)' }}>{quality}%</span>
+            </div>
+            <input type="range" min="10" max="100" value={quality} onChange={e => handleSlider(+e.target.value)} style={{ width: '100%' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--faint)', fontWeight: 600, marginTop: 4 }}>
+              <span>Smaller file</span>
+              <span>Better quality</span>
+            </div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--muted)', fontWeight: 500, lineHeight: 1.55 }}>
+              Move slider left to reduce size. The preview updates automatically so you can judge quality before downloading.
+            </div>
+          </div>
+
+          {/* Size result */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
+              Output size
+            </div>
+            {[
+              { label: 'Original',   val: fmtKb(origKb),  color: 'var(--muted)' },
+              { label: 'Compressed', val: fmtKb(compKb),  color: 'var(--ink)'   },
+              { label: 'Saved',      val: `${savings}%`,  color: savColor       },
+            ].map(({ label, val, color }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 8, alignItems: 'baseline' }}>
+                <span style={{ fontWeight: 600, color: 'var(--muted)' }}>{label}</span>
+                <span style={{ fontWeight: 800, color, fontFamily: "'JetBrains Mono',monospace", fontSize: 13 }}>{val}</span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Nav ──────────────────────────────────────────────────────────────────────
-function Nav({ dark, onToggleDark, onUpload, onGoHome }) {
+function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf }) {
   return (
     <nav style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
@@ -136,6 +439,16 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome }) {
           100% in your browser
         </span>
 
+        <button onClick={onOpenPdf} style={{
+          border: '1px solid var(--line)', cursor: 'pointer', background: 'var(--surface)', color: 'var(--ink)',
+          fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, padding: '10px 18px',
+          borderRadius: 11, display: 'inline-flex', alignItems: 'center', gap: 7,
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+          </svg>
+          Compress PDF
+        </button>
         <button onClick={onUpload} style={{
           border: 'none', cursor: 'pointer', background: 'var(--green)', color: '#fff',
           fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, padding: '10px 18px',
@@ -149,7 +462,7 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome }) {
 }
 
 // ─── Home Page ────────────────────────────────────────────────────────────────
-function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset }) {
+function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf }) {
   return (
     <div style={{ flex: 1 }}>
       {/* HERO */}
@@ -166,22 +479,22 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset })
             boxShadow: '0 2px 8px rgba(22,36,27,.04)', marginBottom: 20,
           }}>
             <span style={{ width: 7, height: 7, borderRadius: 99, background: '#f08a24', display: 'inline-block' }} />
-            Built for Indian competitive exams
+            Photo fixer &amp; PDF compressor — free
           </div>
 
           <h1 style={{
             fontSize: 'clamp(34px,5.4vw,56px)', lineHeight: 1.04,
             letterSpacing: '-.03em', fontWeight: 800, margin: '0 0 18px',
           }}>
-            Exam photo,<br />fixed in <span style={{ color: 'var(--green)' }}>one click</span>.
+            Exam photo &amp; PDF,<br />sorted in <span style={{ color: 'var(--green)' }}>seconds</span>.
           </h1>
 
           <p style={{
             fontSize: 'clamp(15px,1.6vw,18px)', lineHeight: 1.55, color: 'var(--muted)',
             margin: '0 0 26px', maxWidth: 460,
           }}>
-            Auto-crop, change the background, and compress to the exact size NEET, SSC, UPSC,
-            IBPS and more demand — no software, no sign-up, nothing leaves your phone.
+            Resize exam photos for NEET, SSC, UPSC, IBPS, JEE and 20+ more exams — or shrink
+            any PDF to a fraction of its size. All in your browser, nothing uploaded, no sign-up.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
@@ -195,16 +508,28 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset })
                 <path d="M12 16V4M7 9l5-5 5 5" />
                 <path d="M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3" />
               </svg>
-              Upload your photo
+              Fix exam photo
             </button>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>JPG / PNG · no sign-up · free</span>
+            <button onClick={onOpenPdf} style={{
+              border: '1.5px solid var(--line)', cursor: 'pointer', background: 'var(--surface)', color: 'var(--ink)',
+              fontFamily: 'inherit', fontWeight: 700, fontSize: 15.5, padding: '14px 22px',
+              borderRadius: 14, display: 'inline-flex', alignItems: 'center', gap: 9,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+              </svg>
+              Compress PDF
+            </button>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>JPG / PNG / PDF · 100% private · free forever</span>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 34 }}>
             {[
-              { val: '20+',      label: 'exam presets' },
-              { val: '10–300KB', label: 'auto-compressed' },
-              { val: '0',        label: 'uploads to server' },
+              { val: '20+',   label: 'exam presets' },
+              { val: 'PDF',   label: 'compression too' },
+              { val: '0',     label: 'uploads to server' },
             ].map((stat, i) => (
               <>
                 {i > 0 && <div key={`div-${i}`} style={{ width: 1, background: 'var(--line)' }} />}
@@ -262,6 +587,17 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset })
                   }}>{tag}</span>
                 ))}
               </div>
+              <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+                </svg>
+                <button
+                  onClick={e => { e.stopPropagation(); onOpenPdf() }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, color: 'var(--green)', padding: 0 }}
+                >
+                  Want to compress a PDF instead? →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -302,7 +638,7 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset })
                   <div style={{ width: 26, height: 32, borderRadius: 4, background: '#ffffff', border: '1.5px solid var(--line)' }} />
                 )}
               </div>
-              <div style={{ fontWeight: 800, fontSize: 15, letterSpacing: '-.01em', marginBottom: 3 }}>{p.name}</div>
+              <div style={{ fontWeight: 800, fontSize: p.name.length > 18 ? 12 : 15, letterSpacing: '-.01em', marginBottom: 3, lineHeight: 1.3 }}>{p.name}</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', fontFamily: "'JetBrains Mono',monospace" }}>
                 {p.id === 'custom' ? 'any size · any KB' : `${p.w}×${p.h} px`}
               </div>
@@ -588,7 +924,7 @@ function EditorPage({
                     background: sel ? p.tint : 'var(--surface)',
                     borderRadius: 11, padding: '9px 10px', textAlign: 'left',
                   }}>
-                    <div style={{ fontWeight: 700, fontSize: 12.5, color: sel ? p.ink : 'var(--ink)' }}>{p.name}</div>
+                    <div title={p.name} style={{ fontWeight: 700, fontSize: 11.5, color: sel ? p.ink : 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
                     <div style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--faint)', fontFamily: "'JetBrains Mono',monospace" }}>
                       {p.id === 'custom' ? 'custom' : `${p.w}×${p.h}`}
                     </div>
@@ -852,6 +1188,7 @@ export default function App() {
         onToggleDark={() => setDark(d => !d)}
         onUpload={openFile}
         onGoHome={() => setScreen('home')}
+        onOpenPdf={() => setScreen('pdf')}
       />
 
       {screen === 'home' && (
@@ -861,6 +1198,7 @@ export default function App() {
           onDragOver={e => e.preventDefault()}
           onDragLeave={e => e.preventDefault()}
           onSelectPreset={(p) => { handleSelectPreset(p); openFile() }}
+          onOpenPdf={() => setScreen('pdf')}
         />
       )}
 
@@ -887,6 +1225,10 @@ export default function App() {
           onGoHome={() => setScreen('home')}
           onUpload={openFile}
         />
+      )}
+
+      {screen === 'pdf' && (
+        <PdfScreen onBack={() => setScreen('home')} />
       )}
     </div>
   )
