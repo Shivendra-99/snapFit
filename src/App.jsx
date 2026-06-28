@@ -771,7 +771,7 @@ function EditorPage({
   preset, onSelectPreset, onCustomField,
   imgSrc, outputUrl, outputKB, quality,
   bgColor, replaceBg, threshold, vposPct, zoom,
-  onToggleReplace, onSetBg, onSetThreshold, onSetVpos, onSetZoom,
+  onToggleReplace, onSetBg, onSetThreshold, onSetVpos, onSetZoom, onSetQuality,
   onDownload, onGoHome, onUpload,
 }) {
   const ok = outputKB >= preset.min && outputKB <= preset.max
@@ -881,8 +881,27 @@ function EditorPage({
             </div>
           </div>
 
+          {/* Quality / file-size slider */}
+          <div style={{ marginTop: 16, padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>File size / Quality</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 13, color: 'var(--green)' }}>
+                {Math.round(quality * 100)}% · {outputKB} KB
+              </span>
+            </div>
+            <input type="range" min="20" max="100" value={Math.round(quality * 100)} onChange={onSetQuality} style={{ width: '100%' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, fontWeight: 600, color: 'var(--faint)', marginTop: 3 }}>
+              <span>← smaller file</span><span>larger file →</span>
+            </div>
+            {outputKB > preset.max && (
+              <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, color: '#b45309', background: '#fef3c7', borderRadius: 7, padding: '5px 9px' }}>
+                {outputKB} KB exceeds {preset.max} KB limit — slide left to reduce
+              </div>
+            )}
+          </div>
+
           <button onClick={onDownload} style={{
-            width: '100%', marginTop: 16, border: 'none', cursor: 'pointer',
+            width: '100%', marginTop: 10, border: 'none', cursor: 'pointer',
             background: 'var(--green)', color: '#fff', fontFamily: 'inherit', fontWeight: 800,
             fontSize: 16, padding: 16, borderRadius: 14,
             boxShadow: '0 10px 24px rgba(21,128,61,.3)',
@@ -1032,20 +1051,6 @@ function EditorPage({
             <input type="range" min="100" max="180" value={zoom} onChange={onSetZoom} />
           </div>
 
-          {/* File size */}
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
-            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
-              File size
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, lineHeight: 1.5 }}>
-              Auto-compressed to fit{' '}
-              <b style={{ color: 'var(--green-ink)' }}>{preset.min}–{preset.max} KB</b>.
-              {' '}Current output:{' '}
-              <b style={{ color: sizeInk, fontFamily: "'JetBrains Mono',monospace" }}>{outputKB} KB</b>
-              {' '}at {Math.round(quality * 100)}% quality.
-            </div>
-          </div>
 
         </div>
       </div>
@@ -1104,20 +1109,11 @@ export default function App() {
       } catch (_) {}
     }
 
-    let q = 0.92
-    let url = canvas.toDataURL('image/jpeg', q)
-    let kb = kbOf(url)
-    let guard = 0
-    while (kb > preset.max && q > 0.28 && guard < 12) {
-      q = Math.max(0.28, q - 0.08)
-      url = canvas.toDataURL('image/jpeg', q)
-      kb = kbOf(url)
-      guard++
-    }
+    const url = canvas.toDataURL('image/jpeg', quality)
+    const kb  = kbOf(url)
     setOutputUrl(url)
     setOutputKB(kb)
-    setQuality(q)
-  }, [preset, bgColor, replaceBg, threshold, vposPct, zoom, processKey])
+  }, [preset, bgColor, replaceBg, threshold, vposPct, zoom, processKey, quality])
 
   const openFile = useCallback(() => fileRef.current?.click(), [])
 
@@ -1212,6 +1208,7 @@ export default function App() {
           onSetThreshold={(e) => setThreshold(+e.target.value)}
           onSetVpos={(e) => setVposPct(+e.target.value)}
           onSetZoom={(e) => setZoom(+e.target.value)}
+          onSetQuality={(e) => setQuality(+e.target.value / 100)}
           onDownload={download}
           onGoHome={() => setScreen('home')}
           onUpload={openFile}
