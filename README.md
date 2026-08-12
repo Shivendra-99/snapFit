@@ -1,16 +1,33 @@
-# React + Vite
+# SnapFit
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SnapFit is a browser-based React app for exam-ready photo editing and PDF compression.
 
-Currently, two official plugins are available:
+It helps users prepare passport and exam photos for Indian exams like NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, NDA, and more. The app also includes a standalone PDF compressor for reducing PDF file size locally.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Exam photo resizing for 20+ presets
+- Auto crop and face framing for passport/exam photos
+- Background replacement with white, off-white, light blue, or blue
+- JPEG output preview and file size estimation
+- Custom preset support for any width, height, and KB range
+- 100% in-browser processing — no uploads, no server storage
+- PDF compressor with before/after preview and quality slider
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech stack
 
-## Expanding the ESLint configuration
+- React
+- Vite
+- Emotion (`@emotion/react`, `@emotion/styled`)
+- `pdfjs-dist` and `jspdf` for client-side PDF handling
+- ESLint for linting
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notes
+
+- The app supports image uploads in JPG/PNG format for photo editing.
+- PDF compression runs entirely in the browser using `pdfjs-dist` and `jspdf`.
+- The photo tool is designed to help match exam-specific dimension and file size requirements.
+
+## License
+
+This repository is currently private and intended for local development.
