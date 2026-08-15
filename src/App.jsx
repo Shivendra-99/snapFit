@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Fragment } from 'react'
 import './index.css'
 import * as pdfjsLib from 'pdfjs-dist'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -18,27 +18,27 @@ const G = {
 
 const PRESETS = [
   // ── 200×230, 10–200 KB  (NEET / JEE / CUET share identical specs) ────
-  { id: 'neet',   name: 'NEET, JEE, CUET',                    abbr: 'NEET+', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green  },
+  { id: 'neet',   name: 'NEET, JEE, CUET',                    abbr: 'NEET+', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 30  } },
   // ── 200×230, 10–100 KB ───────────────────────────────────────────────
-  { id: 'ugcnet', name: 'UGC NET / SET',                       abbr: 'NET',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 100, ...G.green  },
+  { id: 'ugcnet', name: 'UGC NET / SET',                       abbr: 'NET',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 100, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 30  } },
   // ── 200×230, 10–50 KB ────────────────────────────────────────────────
-  { id: 'mpsc',   name: 'MPSC / UPPSC',                        abbr: 'PSC',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
+  { id: 'mpsc',   name: 'MPSC / UPPSC',                        abbr: 'PSC',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 50,  ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
   // ── 200×230, 20–50 KB  (SSC / CTET / Banking share identical specs) ──
-  { id: 'ssc',    name: 'SSC, CTET, IBPS, SBI, RBI, LIC',     abbr: 'SSC+',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange },
+  { id: 'ssc',    name: 'SSC, CTET, IBPS, SBI, RBI, LIC',     abbr: 'SSC+',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange, sig: { w: 200, h: 80,  min: 10, max: 20  } },
   // ── Others – unique dimensions ────────────────────────────────────────
-  { id: 'gate',   name: 'GATE',                                abbr: 'GATE',  w: 240, h: 320, bg: '#ffffff', min: 5,   max: 200, ...G.green  },
-  { id: 'cat',    name: 'CAT (IIM)',                           abbr: 'CAT',   w: 100, h: 130, bg: '#ffffff', min: 10,  max: 50,  ...G.blue   },
-  { id: 'upsc',   name: 'UPSC CSE',                           abbr: 'UPSC',  w: 350, h: 350, bg: '#ffffff', min: 20,  max: 300, ...G.green  },
-  { id: 'bpsc',   name: 'BPSC',                               abbr: 'BPSC',  w: 215, h: 265, bg: '#ffffff', min: 10,  max: 50,  ...G.orange },
-  { id: 'tnpsc',  name: 'TNPSC',                              abbr: 'TN',    w: 150, h: 200, bg: '#ffffff', min: 10,  max: 40,  ...G.orange },
-  { id: 'rrb',    name: 'RRB / NTPC',                         abbr: 'RRB',   w: 130, h: 160, bg: '#ffffff', min: 15,  max: 40,  ...G.orange },
+  { id: 'gate',   name: 'GATE',                                abbr: 'GATE',  w: 240, h: 320, bg: '#ffffff', min: 5,   max: 200, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 200 } },
+  { id: 'cat',    name: 'CAT (IIM)',                           abbr: 'CAT',   w: 100, h: 130, bg: '#ffffff', min: 10,  max: 50,  ...G.blue,   sig: { w: 150, h: 75,  min: 10, max: 50  } },
+  { id: 'upsc',   name: 'UPSC CSE',                           abbr: 'UPSC',  w: 350, h: 350, bg: '#ffffff', min: 20,  max: 300, ...G.green,  sig: { w: 200, h: 100, min: 10, max: 100 } },
+  { id: 'bpsc',   name: 'BPSC',                               abbr: 'BPSC',  w: 215, h: 265, bg: '#ffffff', min: 10,  max: 50,  ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
+  { id: 'tnpsc',  name: 'TNPSC',                              abbr: 'TN',    w: 150, h: 200, bg: '#ffffff', min: 10,  max: 40,  ...G.orange, sig: { w: 200, h: 80,  min: 10, max: 40  } },
+  { id: 'rrb',    name: 'RRB / NTPC',                         abbr: 'RRB',   w: 130, h: 160, bg: '#ffffff', min: 15,  max: 40,  ...G.orange, sig: { w: 140, h: 60,  min: 10, max: 40  } },
   // ── 200×240, 10–50 KB  (NDA / CDS / AFCAT near-identical) ───────────
-  { id: 'nda',    name: 'NDA, CDS, AFCAT',                    abbr: 'NDA+',  w: 200, h: 240, bg: '#ffffff', min: 10,  max: 50,  ...G.navy   },
+  { id: 'nda',    name: 'NDA, CDS, AFCAT',                    abbr: 'NDA+',  w: 200, h: 240, bg: '#ffffff', min: 10,  max: 50,  ...G.navy,   sig: { w: 200, h: 100, min: 10, max: 50  } },
   // ── ID Documents ─────────────────────────────────────────────────────
-  { id: 'pass',   name: 'Passport 35×45',                     abbr: 'PP',    w: 413, h: 531, bg: '#ffffff', min: 20,  max: 100, ...G.orange },
-  { id: 'visa',   name: 'US Visa 2×2"',                       abbr: 'VISA',  w: 600, h: 600, bg: '#ffffff', min: 100, max: 240, ...G.navy   },
+  { id: 'pass',   name: 'Passport 35×45',                     abbr: 'PP',    w: 413, h: 531, bg: '#ffffff', min: 20,  max: 100, ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
+  { id: 'visa',   name: 'US Visa 2×2"',                       abbr: 'VISA',  w: 600, h: 600, bg: '#ffffff', min: 100, max: 240, ...G.navy,   sig: { w: 200, h: 100, min: 10, max: 50  } },
   // ── Custom ────────────────────────────────────────────────────────────
-  { id: 'custom', name: 'Custom',                              abbr: '✎',     w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.purple },
+  { id: 'custom', name: 'Custom',                              abbr: 'ANY',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.purple, sig: { w: 200, h: 100, min: 4,  max: 50  } },
 ]
 
 const CUSTOM_BASE = PRESETS.find(p => p.id === 'custom')
@@ -204,7 +204,7 @@ function PdfScreen({ onBack }) {
   // ── Upload screen (no PDF loaded yet) ────────────────────────────────
   if (!pdfDoc) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(24px,5vw,60px) clamp(18px,5vw,56px)' }}>
+      <div className="sf-page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(24px,5vw,60px) clamp(18px,5vw,56px)' }}>
         <input ref={fileRef} type="file" accept=".pdf,application/pdf" onChange={e => loadFile(e.target.files?.[0])} style={{ display: 'none' }} />
         <div style={{ textAlign: 'center', maxWidth: 520, width: '100%' }}>
           <button onClick={onBack} style={{
@@ -216,8 +216,10 @@ function PdfScreen({ onBack }) {
             Back to photo tool
           </button>
 
-          <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--tint)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', fontSize: 30 }}>📄</div>
-          <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 10 }}>PDF Compressor</h1>
+          <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--tint)', color: 'var(--green-ink)', display: 'grid', placeItems: 'center', margin: '0 auto 18px' }}>
+            <Ico.file width="28" height="28" />
+          </div>
+          <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 700, letterSpacing: '-.03em', marginBottom: 10 }}>PDF Compressor</h1>
           <p style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
             Reduce PDF file size with a quality slider — see the before &amp; after preview before you download. 100% in your browser, nothing uploaded.
           </p>
@@ -237,7 +239,7 @@ function PdfScreen({ onBack }) {
               </div>
               <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Drop your PDF here</div>
               <div style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 500, marginBottom: 18 }}>or click to browse</div>
-              <span style={{ display: 'inline-block', background: 'var(--tint)', color: 'var(--green)', fontWeight: 700, fontSize: 13.5, padding: '11px 22px', borderRadius: 11, animation: 'pulsering 2.4s infinite' }}>Choose PDF</span>
+              <span style={{ display: 'inline-block', background: 'var(--tint)', color: 'var(--green-ink)', fontWeight: 700, fontSize: 13.5, padding: '11px 22px', borderRadius: 11, animation: 'pulsering 2.4s infinite' }}>Choose PDF</span>
             </div>
           </div>
         </div>
@@ -247,7 +249,7 @@ function PdfScreen({ onBack }) {
 
   // ── Main editor ───────────────────────────────────────────────────────
   return (
-    <div style={{ flex: 1, maxWidth: 1180, width: '100%', margin: '0 auto', padding: 'clamp(18px,3vw,30px) clamp(16px,5vw,40px) 50px', animation: 'fadeup .35s ease both' }}>
+    <div className="sf-page" style={{ maxWidth: 1180, width: '100%', margin: '0 auto', padding: 'clamp(18px,3vw,30px) clamp(16px,5vw,40px) 50px', animation: 'fadeup .35s var(--ease-out) both' }}>
 
       {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24 }}>
@@ -285,7 +287,7 @@ function PdfScreen({ onBack }) {
 
               {/* Compressed */}
               <div style={{ textAlign: 'center', flex: '1 1 140px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green-ink)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>
                   {quality}% quality · {fmtKb(compKb)}
                 </div>
                 <div style={{ background: 'var(--tint)', borderRadius: 10, padding: 6, display: 'inline-block', width: '100%', boxShadow: '0 0 0 2px rgba(21,128,61,.18)', position: 'relative' }}>
@@ -355,7 +357,7 @@ function PdfScreen({ onBack }) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
               <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600 }}>Compression level</span>
-              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 20, color: 'var(--green)' }}>{quality}%</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 20, color: 'var(--green-ink)' }}>{quality}%</span>
             </div>
             <input type="range" min="10" max="100" value={quality} onChange={e => handleSlider(+e.target.value)} style={{ width: '100%' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--faint)', fontWeight: 600, marginTop: 4 }}>
@@ -391,211 +393,329 @@ function PdfScreen({ onBack }) {
   )
 }
 
+// ─── Motion helpers ───────────────────────────────────────────────────────────
+const reducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Reveals every [data-reveal] in the tree the first time it scrolls into view.
+// Re-runs on `key` so a screen change picks up freshly mounted nodes.
+function useRevealOnScroll(key) {
+  useEffect(() => {
+    const nodes = document.querySelectorAll('[data-reveal]:not(.is-in)')
+    if (!nodes.length) return
+    if (reducedMotion()) {
+      nodes.forEach(n => n.classList.add('is-in'))
+      return
+    }
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return
+        e.target.classList.add('is-in')
+        io.unobserve(e.target)
+      })
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.12 })
+    nodes.forEach(n => io.observe(n))
+
+    // Safety net: content must never stay invisible because the observer
+    // was throttled (background tab, headless render, print).
+    const failsafe = setTimeout(() => nodes.forEach(n => n.classList.add('is-in')), 2500)
+
+    return () => { clearTimeout(failsafe); io.disconnect() }
+  }, [key])
+}
+
+// Feeds the pointer position to CSS (spotlight) and, optionally, a 3D tilt.
+function trackPointer(e, tiltDeg = 0) {
+  const el = e.currentTarget
+  const r  = el.getBoundingClientRect()
+  const px = (e.clientX - r.left) / r.width
+  const py = (e.clientY - r.top) / r.height
+  el.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`)
+  el.style.setProperty('--my', `${(py * 100).toFixed(1)}%`)
+  if (tiltDeg && !reducedMotion()) {
+    el.style.setProperty('--tilt-y', `${((px - 0.5) * 2 * tiltDeg).toFixed(2)}deg`)
+    el.style.setProperty('--tilt-x', `${(-(py - 0.5) * 2 * tiltDeg).toFixed(2)}deg`)
+  }
+}
+
+function releasePointer(e) {
+  e.currentTarget.style.setProperty('--tilt-x', '0deg')
+  e.currentTarget.style.setProperty('--tilt-y', '0deg')
+}
+
+// Counts a number up on mount; lands immediately under reduced motion.
+// Not gated on scroll — a throttled observer must never leave a wrong number on screen.
+function useCountUp(target) {
+  const [n, setN] = useState(() => (reducedMotion() ? target : 0))
+  useEffect(() => {
+    if (reducedMotion()) return
+    let raf, t0
+    const step = (t) => {
+      if (t0 === undefined) t0 = t
+      const p = Math.min(1, (t - t0) / 1100)
+      setN(Math.round(target * (1 - Math.pow(1 - p, 3))))   // ease-out cubic
+      if (p < 1) raf = requestAnimationFrame(step)
+      else setN(target)
+    }
+    raf = requestAnimationFrame(step)
+    // rAF is paused in background tabs — timers are not. Never leave a wrong number up.
+    const failsafe = setTimeout(() => setN(target), 2500)
+    return () => { clearTimeout(failsafe); cancelAnimationFrame(raf) }
+  }, [target])
+  return n
+}
+
+function useScrolled(px = 8) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > px)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [px])
+  return scrolled
+}
+
+// ─── Button with pointer-anchored ripple ──────────────────────────────────────
+function Btn({ variant = '', className = '', onClick, children, ...rest }) {
+  const ref = useRef(null)
+
+  const handleClick = (e) => {
+    const el = ref.current
+    if (el && !reducedMotion()) {
+      const r = el.getBoundingClientRect()
+      const ink = document.createElement('span')
+      ink.className = 'sf-ripple'
+      ink.style.setProperty('--rx', `${e.clientX - r.left}px`)
+      ink.style.setProperty('--ry', `${e.clientY - r.top}px`)
+      el.appendChild(ink)
+      setTimeout(() => ink.remove(), 640)
+    }
+    onClick?.(e)
+  }
+
+  return (
+    <button
+      ref={ref}
+      className={['sf-btn', variant, className].filter(Boolean).join(' ')}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  )
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
+const Ico = {
+  upload: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M12 16V4M7 9l5-5 5 5" /><path d="M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3" />
+    </svg>
+  ),
+  file: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+    </svg>
+  ),
+  camera: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <rect x="3" y="6" width="18" height="14" rx="2.5" /><circle cx="12" cy="13" r="3.4" /><path d="M8 6l1.4-2.4h5.2L16 6" />
+    </svg>
+  ),
+  pen: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M3 18.5c3-1 4-6 7-6s2.5 3.5 5 3.5c1.6 0 2.8-1.2 3.6-2.4" /><path d="M14.5 5.5l4 4L9 19l-4.5.5L5 15z" />
+    </svg>
+  ),
+  sun: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" aria-hidden="true" {...p}>
+      <circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" />
+    </svg>
+  ),
+  moon: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z" />
+    </svg>
+  ),
+  arrow: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  ),
+  chevron: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  ),
+  shield: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M12 2.7l7.5 3v5.6c0 4.6-3.1 8.6-7.5 10-4.4-1.4-7.5-5.4-7.5-10V5.7z" /><path d="M9 12l2.2 2.2L15.4 10" />
+    </svg>
+  ),
+}
+
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf }) {
+  const stuck = useScrolled()
+
   return (
-    <nav style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-      padding: '16px clamp(18px,5vw,56px)', position: 'sticky', top: 0, zIndex: 30,
-      background: 'var(--navbg)', backdropFilter: 'blur(10px)',
-      borderBottom: '1px solid var(--line)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, cursor: 'pointer' }} onClick={onGoHome}>
-        <div style={{
-          width: 38, height: 38, borderRadius: 11, background: 'var(--green)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(21,128,61,.32)',
-        }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="6" width="18" height="14" rx="2.5" />
-            <circle cx="12" cy="13" r="3.4" />
-            <path d="M8 6l1.4-2.4h5.2L16 6" />
-          </svg>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05 }}>
-          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-.02em' }}>SnapFit</span>
-          <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--muted)', letterSpacing: '.02em' }}>Exam Photo Fixer</span>
-        </div>
-      </div>
+    <nav className={`sf-nav${stuck ? ' is-stuck' : ''}`}>
+      <button className="sf-brand" onClick={onGoHome} aria-label="SnapFit home">
+        <span className="sf-logo"><Ico.camera width="20" height="20" /></span>
+        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05, textAlign: 'left' }}>
+          <span className="sf-display" style={{ fontWeight: 700, fontSize: 17, letterSpacing: '-.025em' }}>SnapFit</span>
+          <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--muted)' }}>Exam Photo Fixer</span>
+        </span>
+      </button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button onClick={onToggleDark} title="Toggle light / dark" style={{
-          border: '1px solid var(--line)', background: 'var(--surface)', cursor: 'pointer',
-          width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', color: 'var(--ink)', padding: 0,
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
-            <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" />
-          </svg>
-        </button>
-
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600,
-          color: 'var(--green-ink)', background: 'var(--tint)', padding: '7px 13px',
-          borderRadius: 99, border: '1px solid rgba(21,128,61,.16)',
-        }}>
-          <span style={{ width: 7, height: 7, borderRadius: 99, background: '#16a34a', display: 'inline-block' }} />
+        <span className="sf-chip sf-chip--brand sf-hide-sm">
+          <span className="sf-dot sf-dot--live" style={{ color: 'var(--green)' }} />
           100% in your browser
         </span>
 
-        <button onClick={onOpenPdf} style={{
-          border: '1px solid var(--line)', cursor: 'pointer', background: 'var(--surface)', color: 'var(--ink)',
-          fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, padding: '10px 18px',
-          borderRadius: 11, display: 'inline-flex', alignItems: 'center', gap: 7,
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
-          </svg>
+        <Btn
+          variant="sf-btn--icon sf-theme-btn"
+          onClick={onToggleDark}
+          aria-pressed={dark}
+          aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+          title={dark ? 'Light theme' : 'Dark theme'}
+        >
+          {dark ? <Ico.sun width="18" height="18" /> : <Ico.moon width="18" height="18" />}
+        </Btn>
+
+        <Btn onClick={onOpenPdf} className="sf-hide-sm">
+          <Ico.file width="15" height="15" />
           Compress PDF
-        </button>
-        <button onClick={onUpload} style={{
-          border: 'none', cursor: 'pointer', background: 'var(--green)', color: '#fff',
-          fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5, padding: '10px 18px',
-          borderRadius: 11, boxShadow: '0 4px 12px rgba(21,128,61,.28)',
-        }}>
+        </Btn>
+
+        <Btn variant="sf-btn--primary" onClick={onUpload}>
+          <Ico.upload width="15" height="15" />
           Upload photo
-        </button>
+        </Btn>
       </div>
     </nav>
   )
 }
 
 // ─── Home Page ────────────────────────────────────────────────────────────────
-function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf }) {
+const HERO_WORDS = ['Exam', 'photo', '&', 'PDF,', 'sorted', 'in']
+
+function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, mode, onSetMode }) {
+  const [dragging, setDragging] = useState(false)
+  const presetCount = useCountUp(20)
+
+  useRevealOnScroll('home')
+
+  const handleDrop = (e) => { setDragging(false); onDrop(e) }
+  const handleOver = (e) => { e.preventDefault(); setDragging(true); onDragOver(e) }
+  const handleLeave = (e) => { setDragging(false); onDragLeave(e) }
+
   return (
-    <div style={{ flex: 1 }}>
-      {/* HERO */}
-      <section style={{
-        display: 'flex', flexWrap: 'wrap', gap: 'clamp(28px,5vw,64px)', alignItems: 'center',
-        maxWidth: 1180, margin: '0 auto',
-        padding: 'clamp(28px,5vw,64px) clamp(18px,5vw,56px) clamp(20px,4vw,44px)',
-      }}>
-        <div style={{ flex: '1 1 360px', animation: 'fadeup .5s ease both' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7, background: 'var(--surface)',
-            border: '1px solid var(--line)', padding: '7px 13px', borderRadius: 99,
-            fontSize: 12.5, fontWeight: 700, color: '#b8650c',
-            boxShadow: '0 2px 8px rgba(22,36,27,.04)', marginBottom: 20,
-          }}>
-            <span style={{ width: 7, height: 7, borderRadius: 99, background: '#f08a24', display: 'inline-block' }} />
+    <div className="sf-page">
+      {/* ── HERO ────────────────────────────────────────────────────────── */}
+      <section className="sf-container sf-hero">
+        <div>
+          <div className="sf-chip" style={{ color: 'var(--amber)', marginBottom: 20 }} data-reveal>
+            <span className="sf-dot sf-dot--live" />
             Photo fixer &amp; PDF compressor — free
           </div>
 
-          <h1 style={{
-            fontSize: 'clamp(34px,5.4vw,56px)', lineHeight: 1.04,
-            letterSpacing: '-.03em', fontWeight: 800, margin: '0 0 18px',
-          }}>
-            Exam photo &amp; PDF,<br />sorted in <span style={{ color: 'var(--green)' }}>seconds</span>.
+          <h1 className="sf-h1">
+            {/* Space sits outside the inline-block or it collapses at the edge */}
+            {HERO_WORDS.map((w, i) => (
+              <Fragment key={w + i}>
+                <span className="sf-word" style={{ '--d': `${80 + i * 65}ms` }}>{w}</span>{' '}
+              </Fragment>
+            ))}
+            <span className="sf-word" style={{ '--d': `${80 + HERO_WORDS.length * 65}ms` }}>
+              <span className="sf-grad-word">seconds</span>.
+            </span>
           </h1>
 
-          <p style={{
-            fontSize: 'clamp(15px,1.6vw,18px)', lineHeight: 1.55, color: 'var(--muted)',
-            margin: '0 0 26px', maxWidth: 460,
-          }}>
+          <p className="sf-lede" data-reveal style={{ '--d': '260ms' }}>
             Resize exam photos for NEET, SSC, UPSC, IBPS, JEE and 20+ more exams — or shrink
             any PDF to a fraction of its size. All in your browser, nothing uploaded, no sign-up.
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-            <button onClick={onUpload} style={{
-              border: 'none', cursor: 'pointer', background: 'var(--green)', color: '#fff',
-              fontFamily: 'inherit', fontWeight: 700, fontSize: 15.5, padding: '15px 26px',
-              borderRadius: 14, boxShadow: '0 8px 22px rgba(21,128,61,.3)',
-              display: 'inline-flex', alignItems: 'center', gap: 9,
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 16V4M7 9l5-5 5 5" />
-                <path d="M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3" />
-              </svg>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }} data-reveal>
+            <Btn variant="sf-btn--primary sf-btn--lg" onClick={onUpload}>
+              <Ico.upload width="18" height="18" />
               Fix exam photo
-            </button>
-            <button onClick={onOpenPdf} style={{
-              border: '1.5px solid var(--line)', cursor: 'pointer', background: 'var(--surface)', color: 'var(--ink)',
-              fontFamily: 'inherit', fontWeight: 700, fontSize: 15.5, padding: '14px 22px',
-              borderRadius: 14, display: 'inline-flex', alignItems: 'center', gap: 9,
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
-              </svg>
+            </Btn>
+            <Btn variant="sf-btn--lg" onClick={onOpenPdf}>
+              <Ico.file width="18" height="18" />
               Compress PDF
-            </button>
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>JPG / PNG / PDF · 100% private · free forever</span>
+            </Btn>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 34 }}>
-            {[
-              { val: '20+',   label: 'exam presets' },
-              { val: 'PDF',   label: 'compression too' },
-              { val: '0',     label: 'uploads to server' },
-            ].map((stat, i) => (
-              <>
-                {i > 0 && <div key={`div-${i}`} style={{ width: 1, background: 'var(--line)' }} />}
-                <div key={stat.label}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--green)' }}>{stat.val}</div>
-                  <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--muted)' }}>{stat.label}</div>
-                </div>
-              </>
-            ))}
+          <p style={{ marginTop: 12, fontSize: 13, fontWeight: 600, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 7 }} data-reveal>
+            <Ico.shield width="14" height="14" style={{ color: 'var(--green-ink)' }} />
+            JPG / PNG / PDF · 100% private · free forever
+          </p>
+
+          <div className="sf-stats" data-reveal style={{ '--d': '120ms' }}>
+            <div>
+              <div className="sf-stat-val">{presetCount}+</div>
+              <div className="sf-stat-lbl">exam presets</div>
+            </div>
+            <div className="sf-stat-rule" />
+            <div>
+              <div className="sf-stat-val">PDF</div>
+              <div className="sf-stat-lbl">compression too</div>
+            </div>
+            <div className="sf-stat-rule" />
+            <div>
+              <div className="sf-stat-val">0</div>
+              <div className="sf-stat-lbl">uploads to server</div>
+            </div>
           </div>
         </div>
 
-        {/* Upload card */}
-        <div style={{ flex: '1 1 340px', animation: 'fadeup .6s ease both' }}>
+        {/* Upload card — tilts toward the pointer, lights up under it */}
+        <div data-reveal style={{ '--d': '160ms' }}>
           <div
-            className="upload-area"
+            className={`upload-area${dragging ? ' is-dragging' : ''}`}
+            role="button"
+            tabIndex={0}
+            aria-label="Choose or drop a photo to fix"
             onClick={onUpload}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onUpload() } }}
+            onPointerMove={e => trackPointer(e, 5)}
+            onPointerLeave={releasePointer}
+            onDrop={handleDrop}
+            onDragOver={handleOver}
+            onDragLeave={handleLeave}
           >
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(120% 80% at 50% -10%,var(--tint) 0%,transparent 60%)',
-              pointerEvents: 'none',
-            }} />
-            <div style={{ position: 'relative' }}>
-              <div style={{
-                width: 74, height: 74, margin: '0 auto 18px', borderRadius: 20,
-                background: 'var(--green)', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', animation: 'floaty 3.4s ease-in-out infinite',
-                boxShadow: '0 10px 24px rgba(21,128,61,.34)',
-              }}>
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 15V3M8 7l4-4 4 4" />
-                  <path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
-                </svg>
+            <div className="sf-drop-inner">
+              <div className="sf-drop-icon">
+                <Ico.upload width="34" height="34" />
               </div>
-              <div style={{ fontSize: 19, fontWeight: 800, marginBottom: 6 }}>Drop your photo here</div>
+              <div style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }} className="sf-display">
+                {dragging ? 'Drop it — we’ve got it' : 'Drop your photo here'}
+              </div>
               <div style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 500, marginBottom: 20 }}>
                 or click to browse · JPG, PNG up to 20MB
               </div>
-              <span style={{
-                display: 'inline-block', background: 'var(--tint)', color: 'var(--green)',
-                fontWeight: 700, fontSize: 13.5, padding: '11px 22px', borderRadius: 11,
-                animation: 'pulsering 2.4s infinite',
-              }}>
-                Choose file
-              </span>
+              <span className="sf-drop-cta">Choose file</span>
+
               <div style={{ marginTop: 20, display: 'flex', gap: 7, justifyContent: 'center', flexWrap: 'wrap' }}>
-                {['Auto crop', 'BG replace', 'KB fit'].map(tag => (
-                  <span key={tag} style={{
-                    fontSize: 11, fontWeight: 600, color: 'var(--faint)',
-                    background: 'var(--surface2)', padding: '5px 10px', borderRadius: 7,
-                  }}>{tag}</span>
+                {['Auto crop', 'BG replace', 'KB fit'].map((tag, i) => (
+                  <span key={tag} className="sf-tag" style={{ transitionDelay: `${i * 45}ms` }}>{tag}</span>
                 ))}
               </div>
-              <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
-                </svg>
+
+              <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
                 <button
                   onClick={e => { e.stopPropagation(); onOpenPdf() }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, color: 'var(--green)', padding: 0 }}
+                  className="sf-btn sf-btn--quiet"
+                  style={{ fontSize: 12.5, padding: '10px 14px' }}
                 >
-                  Want to compress a PDF instead? →
+                  <Ico.file width="13" height="13" />
+                  Want to compress a PDF instead?
+                  <Ico.arrow width="13" height="13" />
                 </button>
               </div>
             </div>
@@ -603,83 +723,100 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
         </div>
       </section>
 
-      {/* PRESETS */}
-      <section style={{
-        maxWidth: 1180, margin: '0 auto',
-        padding: 'clamp(18px,3vw,32px) clamp(18px,5vw,56px) clamp(28px,4vw,48px)',
-      }}>
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', alignItems: 'baseline',
-          justifyContent: 'space-between', gap: 10, marginBottom: 22,
-        }}>
-          <h2 style={{ fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>
-            Pick your exam
-          </h2>
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>
-            We auto-apply the official-style dimensions & file size
-          </span>
+      {/* ── PRESETS ─────────────────────────────────────────────────────── */}
+      <section className="sf-container" style={{ paddingBlock: 'clamp(18px,3vw,32px) clamp(28px,4vw,52px)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 14, marginBottom: 22 }} data-reveal>
+          <div>
+            <h2 className="sf-h2" style={{ marginBottom: 5 }}>Pick your exam</h2>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>
+              {mode === 'sig' ? 'Showing signature dimensions & KB limits' : 'Showing photo dimensions & KB limits'}
+            </span>
+          </div>
+
+          <div className="sf-seg" role="tablist" aria-label="Preset dimension mode">
+            <span className="sf-seg-thumb" style={{ left: mode === 'photo' ? 4 : '50%', width: 'calc(50% - 4px)' }} />
+            {[
+              { val: 'photo', label: 'Photo',     Icon: Ico.camera },
+              { val: 'sig',   label: 'Signature', Icon: Ico.pen    },
+            ].map(({ val, label, Icon }) => (
+              <button
+                key={val}
+                role="tab"
+                aria-selected={mode === val}
+                className="sf-seg-btn"
+                style={{ flex: '1 1 0', minWidth: 118, justifyContent: 'center' }}
+                onClick={() => onSetMode(val)}
+              >
+                <Icon width="14" height="14" />
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(168px,1fr))', gap: 14 }}>
-          {PRESETS.map(p => (
-            <div
-              key={p.id}
-              className="preset-card"
-              onClick={() => onSelectPreset(p)}
-              style={p.id === 'custom' ? { borderStyle: 'dashed', borderColor: p.ink, opacity: 0.9 } : {}}
-            >
-              <div style={{ marginBottom: 12 }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10, background: p.tint,
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 800, fontSize: p.id === 'custom' ? 18 : 11.5, color: p.ink, letterSpacing: '-.01em',
-                }}>{p.abbr}</div>
-              </div>
-              <div style={{ fontWeight: 800, fontSize: p.name.length > 18 ? 11.5 : 14.5, letterSpacing: '-.01em', marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', fontFamily: "'JetBrains Mono',monospace", marginBottom: 8 }}>
-                {p.id === 'custom' ? 'any size · any KB' : `${p.w}×${p.h} px · ${p.min}–${p.max} KB`}
-              </div>
-            </div>
-          ))}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(172px,1fr))', gap: 14 }}>
+          {PRESETS.map((p, i) => {
+            const d = mode === 'sig' ? p.sig : p
+            return (
+              <button
+                key={p.id}
+                className="preset-card"
+                data-reveal
+                style={{
+                  '--d': `${Math.min(i, 8) * 45}ms`,
+                  '--card-glow': `${p.ink}22`,
+                  ...(p.id === 'custom' ? { borderStyle: 'dashed', borderColor: p.ink } : {}),
+                }}
+                onPointerMove={e => trackPointer(e)}
+                onClick={() => onSelectPreset(p)}
+                aria-label={`${p.name} — ${p.id === 'custom' ? 'custom size' : `${d.w} by ${d.h} pixels, ${d.min} to ${d.max} kilobytes`}`}
+              >
+                <div style={{ marginBottom: 12 }}>
+                  <span className="preset-badge" style={{ background: p.tint, color: p.ink, fontSize: 11.5 }}>
+                    {p.abbr}
+                  </span>
+                </div>
+                <div className="preset-name" style={{ fontSize: p.name.length > 18 ? 11.5 : 14.5 }}>{p.name}</div>
+                <div className="preset-spec">
+                  {p.id === 'custom' ? 'any size · any KB' : `${d.w}×${d.h} px · ${d.min}–${d.max} KB`}
+                </div>
+                <span className="preset-go"><Ico.arrow width="16" height="16" /></span>
+              </button>
+            )
+          })}
         </div>
 
-        <p style={{ fontSize: 11.5, color: 'var(--faint)', fontWeight: 500, margin: '18px 0 0', textAlign: 'center' }}>
+        <p style={{ fontSize: 11.5, color: 'var(--faint)', fontWeight: 500, margin: '20px 0 0', textAlign: 'center' }}>
           Specs are illustrative defaults — always confirm exact requirements in the official exam notification before final upload.
         </p>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section style={{ background: 'var(--surface)', borderTop: '1px solid var(--line)' }}>
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(34px,5vw,58px) clamp(18px,5vw,56px)' }}>
-          <h2 style={{
-            fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 800, letterSpacing: '-.02em',
-            margin: '0 0 28px', textAlign: 'center',
-          }}>
+      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
+      <section style={{ background: 'var(--surface)', borderBlock: '1px solid var(--line)' }}>
+        <div className="sf-container" style={{ paddingBlock: 'clamp(34px,5vw,62px)' }}>
+          <h2 className="sf-h2" style={{ textAlign: 'center', marginBottom: 30 }} data-reveal>
             Three steps. Thirty seconds.
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 18 }}>
+          <div className="sf-steps">
             {[
-              { n: 1, bg: 'var(--tint)', c: 'var(--green)', title: 'Upload',           desc: "Drop any selfie or studio photo. It never leaves your device." },
-              { n: 2, bg: '#fdeede',     c: '#c4730e',       title: 'Pick exam & tweak', desc: "We crop to size, swap the background, and frame the face for you." },
-              { n: 3, bg: 'var(--tint)', c: 'var(--green)', title: 'Download',          desc: "Get a JPG that already fits the exact KB range. Upload & done." },
-            ].map(step => (
-              <div key={step.n} style={{ textAlign: 'center', padding: 10 }}>
-                <div style={{
-                  width: 54, height: 54, borderRadius: 16, background: step.bg, color: step.c,
-                  fontWeight: 800, fontSize: 20, display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', margin: '0 auto 16px',
-                }}>{step.n}</div>
-                <div style={{ fontWeight: 800, fontSize: 17, marginBottom: 6 }}>{step.title}</div>
-                <div style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.5 }}>{step.desc}</div>
+              { n: 1, bg: 'var(--tint)',      c: 'var(--green-ink)', title: 'Upload',           desc: 'Drop any selfie or studio photo. It never leaves your device.' },
+              { n: 2, bg: 'var(--amber-tint)', c: 'var(--amber)',    title: 'Pick exam & tweak', desc: 'We crop to size, swap the background, and frame the face for you.' },
+              { n: 3, bg: 'var(--tint)',      c: 'var(--green-ink)', title: 'Download',          desc: 'Get a JPG that already fits the exact KB range. Upload & done.' },
+            ].map((step, i) => (
+              <div className="sf-step" key={step.n} data-reveal style={{ '--d': `${i * 110}ms` }}>
+                {i < 2 && <span className="sf-step-rail" />}
+                <div className="sf-step-num" style={{ background: step.bg, color: step.c }}>{step.n}</div>
+                <div className="sf-display" style={{ fontWeight: 700, fontSize: 17, marginBottom: 6 }}>{step.title}</div>
+                <div style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.55 }}>{step.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ — targeted at search queries like "NEET photo size", "compress to 50kb" */}
-      <section style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(34px,5vw,58px) clamp(18px,5vw,56px)' }}>
-        <h2 style={{ fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 28px', textAlign: 'center' }}>
+      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+      <section className="sf-container" style={{ paddingBlock: 'clamp(34px,5vw,62px)' }}>
+        <h2 className="sf-h2" style={{ textAlign: 'center', marginBottom: 30 }} data-reveal>
           Frequently asked questions
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 780, margin: '0 auto' }}>
@@ -717,16 +854,16 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
               a: 'Nearly all Indian exams — NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, NDA, AFCAT, CTET — require JPEG (JPG) format. SnapFit always produces a JPEG output and auto-compresses it to the KB target of the chosen exam.',
             },
           ].map(({ q, a }, i) => (
-            <FaqItem key={i} q={q} a={a} />
+            <FaqItem key={q} q={q} a={a} idx={i} />
           ))}
         </div>
       </section>
 
-      <footer style={{ borderTop: '1px solid var(--line)', padding: '28px clamp(18px,5vw,56px)', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 12, color: 'var(--faint)', fontWeight: 500 }}>
+      <footer className="sf-container" style={{ borderTop: '1px solid var(--line)', paddingBlock: 28, display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontSize: 12, color: 'var(--faint)', fontWeight: 500, maxWidth: '62ch' }}>
           © 2026 SnapFit · Photos processed locally, never uploaded · Not affiliated with NTA, UPSC, SSC or any examination body.
         </div>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {['NEET', 'JEE', 'UPSC', 'SSC', 'IBPS', 'RRB', 'GATE', 'NDA', 'Passport'].map(tag => (
             <span key={tag} style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--faint)' }}>{tag} photo</span>
           ))}
@@ -736,32 +873,25 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
   )
 }
 
-function FaqItem({ q, a }) {
+function FaqItem({ q, a, idx }) {
   const [open, setOpen] = useState(false)
+  const id = `faq-${idx}`
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
+    <div className={`sf-faq${open ? ' is-open' : ''}`} data-reveal style={{ '--d': `${Math.min(idx, 5) * 40}ms` }}>
       <button
+        className="sf-faq-q"
+        id={`${id}-q`}
         onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
-          padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-          fontFamily: 'inherit', fontWeight: 700, fontSize: 14.5, color: 'var(--ink)',
-        }}
+        aria-expanded={open}
+        aria-controls={id}
       >
         <span>{q}</span>
-        <svg
-          width="18" height="18" viewBox="0 0 24 24" fill="none"
-          stroke="var(--green)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0, transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        <Ico.chevron className="sf-faq-icon" width="18" height="18" />
       </button>
-      {open && (
-        <div style={{ padding: '0 20px 16px', fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.65, borderTop: '1px solid var(--line)' }}>
-          {a}
-        </div>
-      )}
+      {/* `inert` (not `hidden`) so the panel can animate its height open */}
+      <div className="sf-faq-a" id={id} role="region" aria-labelledby={`${id}-q`} inert={!open}>
+        <div><p>{a}</p></div>
+      </div>
     </div>
   )
 }
@@ -770,15 +900,17 @@ function FaqItem({ q, a }) {
 function EditorPage({
   preset, onSelectPreset, onCustomField,
   imgSrc, outputUrl, outputKB, quality,
+  mode, onSetMode,
   bgColor, replaceBg, threshold, vposPct, zoom,
   onToggleReplace, onSetBg, onSetThreshold, onSetVpos, onSetZoom, onSetQuality,
   onDownload, onGoHome, onUpload,
 }) {
-  const ok = outputKB >= preset.min && outputKB <= preset.max
+  const dims = mode === 'sig' ? preset.sig : preset
+  const ok = outputKB >= dims.min && outputKB <= dims.max
   const box = 210
-  const scale = Math.min(box / preset.w, 250 / preset.h, 1)
-  const previewW = Math.round(preset.w * scale)
-  const previewH = Math.round(preset.h * scale)
+  const scale = Math.min(box / dims.w, 250 / dims.h, 1)
+  const previewW = Math.round(dims.w * scale)
+  const previewH = Math.round(dims.h * scale)
   const vposLabel = vposPct === 0 ? 'center' : (vposPct < 0 ? `${-vposPct}% up` : `${vposPct}% down`)
   const sizeBg   = ok ? 'var(--tint)' : '#fdeede'
   const sizeDot  = ok ? '#16a34a' : '#e08a1e'
@@ -786,10 +918,10 @@ function EditorPage({
   const sizeMark = ok ? '✓' : '!'
 
   return (
-    <div style={{
-      flex: 1, maxWidth: 1180, width: '100%', margin: '0 auto',
+    <div className="sf-page" style={{
+      maxWidth: 1180, width: '100%', margin: '0 auto',
       padding: 'clamp(18px,3vw,30px) clamp(16px,5vw,40px) 50px',
-      animation: 'fadeup .35s ease both',
+      animation: 'fadeup .35s var(--ease-out) both',
     }}>
       {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 20 }}>
@@ -846,7 +978,7 @@ function EditorPage({
 
               {/* Output */}
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--green-ink)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>
                   Exam-ready
                 </div>
                 <div style={{ background: 'var(--tint)', borderRadius: 12, padding: 8, display: 'inline-block', boxShadow: '0 0 0 2px rgba(21,128,61,.18)' }}>
@@ -859,7 +991,7 @@ function EditorPage({
                   )}
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>
-                  {preset.w}×{preset.h} px
+                  {dims.w}×{dims.h} px
                 </div>
               </div>
             </div>
@@ -868,11 +1000,11 @@ function EditorPage({
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 22, paddingTop: 20, borderTop: '1px solid var(--line)' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--tint)', padding: '8px 13px', borderRadius: 10 }}>
                 <span style={{ width: 18, height: 18, borderRadius: 99, background: '#16a34a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>✓</span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--green-ink)' }}>Dimensions {preset.w}×{preset.h}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--green-ink)' }}>Dimensions {dims.w}×{dims.h}</span>
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: sizeBg, padding: '8px 13px', borderRadius: 10 }}>
                 <span style={{ width: 18, height: 18, borderRadius: 99, background: sizeDot, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>{sizeMark}</span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: sizeInk }}>{outputKB} KB · target {preset.min}–{preset.max}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: sizeInk }}>{outputKB} KB · target {dims.min}–{dims.max}</span>
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--tint)', padding: '8px 13px', borderRadius: 10 }}>
                 <span style={{ width: 18, height: 18, borderRadius: 99, background: '#16a34a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>✓</span>
@@ -885,7 +1017,7 @@ function EditorPage({
           <div style={{ marginTop: 16, padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>File size / Quality</span>
-              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 13, color: 'var(--green)' }}>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 13, color: 'var(--green-ink)' }}>
                 {Math.round(quality * 100)}% · {outputKB} KB
               </span>
             </div>
@@ -893,9 +1025,9 @@ function EditorPage({
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, fontWeight: 600, color: 'var(--faint)', marginTop: 3 }}>
               <span>← smaller file</span><span>larger file →</span>
             </div>
-            {outputKB > preset.max && (
+            {outputKB > dims.max && (
               <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, color: '#b45309', background: '#fef3c7', borderRadius: 7, padding: '5px 9px' }}>
-                {outputKB} KB exceeds {preset.max} KB limit — slide left to reduce
+                {outputKB} KB exceeds {dims.max} KB limit — slide left to reduce
               </div>
             )}
           </div>
@@ -917,6 +1049,29 @@ function EditorPage({
 
         {/* CONTROLS PANEL */}
         <div style={{ flex: '0 1 360px', minWidth: 280, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Photo / Signature toggle */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+              {mode === 'sig' ? 'Signature mode' : 'Photo mode'}
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginTop: 2, fontFamily: "'JetBrains Mono',monospace" }}>
+                {dims.w}×{dims.h} px · {dims.min}–{dims.max} KB
+              </div>
+            </div>
+            <div style={{ display: 'inline-flex', background: 'var(--surface2)', borderRadius: 99, padding: 3, flexShrink: 0 }}>
+              {[{ val: 'photo', label: '📷 Photo' }, { val: 'sig', label: '✍ Signature' }].map(opt => (
+                <button key={opt.val} onClick={() => onSetMode(opt.val)} style={{
+                  border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 12,
+                  padding: '7px 13px', borderRadius: 99,
+                  background: mode === opt.val ? 'var(--green)' : 'transparent',
+                  color: mode === opt.val ? '#fff' : 'var(--muted)',
+                  transition: 'background .15s, color .15s',
+                }}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Exam preset */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
@@ -1019,7 +1174,7 @@ function EditorPage({
               <div style={{ marginTop: 15 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
                   <span>Background sensitivity</span>
-                  <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green)' }}>{threshold}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green-ink)' }}>{threshold}</span>
                 </div>
                 <input type="range" min="20" max="120" value={threshold} onChange={onSetThreshold} />
                 <div style={{ fontSize: 10.5, color: 'var(--faint)', fontWeight: 500, marginTop: 4 }}>
@@ -1037,7 +1192,7 @@ function EditorPage({
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
               <span>Vertical position</span>
-              <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green)' }}>{vposLabel}</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green-ink)' }}>{vposLabel}</span>
             </div>
             <input type="range" min="-40" max="40" value={vposPct} onChange={onSetVpos} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, fontWeight: 600, color: 'var(--faint)', marginTop: 2 }}>
@@ -1046,7 +1201,7 @@ function EditorPage({
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', margin: '16px 0 6px' }}>
               <span>Zoom</span>
-              <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green)' }}>{zoom}%</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green-ink)' }}>{zoom}%</span>
             </div>
             <input type="range" min="100" max="180" value={zoom} onChange={onSetZoom} />
           </div>
@@ -1061,7 +1216,11 @@ function EditorPage({
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen,    setScreen]    = useState('home')
-  const [dark,      setDark]      = useState(false)
+  const [dark,      setDark]      = useState(() => {
+    const saved = localStorage.getItem('snapfit-theme')
+    if (saved) return saved === 'dark'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
   const [imgSrc,    setImgSrc]    = useState(null)
   const [preset,    setPreset]    = useState(PRESETS[0])
   const [bgColor,   setBgColor]   = useState('#ffffff')
@@ -1072,6 +1231,7 @@ export default function App() {
   const [outputUrl, setOutputUrl] = useState(null)
   const [outputKB,  setOutputKB]  = useState(0)
   const [quality,   setQuality]   = useState(0.92)
+  const [mode,      setMode]      = useState('photo')
   const [processKey, setProcessKey] = useState(0)
 
   const fileRef  = useRef(null)
@@ -1084,27 +1244,29 @@ export default function App() {
     if (!img) return
     if (!canvasRef.current) canvasRef.current = document.createElement('canvas')
 
+    const dims = mode === 'sig' ? preset.sig : preset
+
     const canvas = canvasRef.current
-    canvas.width  = preset.w
-    canvas.height = preset.h
+    canvas.width  = dims.w
+    canvas.height = dims.h
     const ctx = canvas.getContext('2d')
 
-    ctx.clearRect(0, 0, preset.w, preset.h)
+    ctx.clearRect(0, 0, dims.w, dims.h)
     ctx.fillStyle = bgColor
-    ctx.fillRect(0, 0, preset.w, preset.h)
+    ctx.fillRect(0, 0, dims.w, dims.h)
 
-    const s = Math.max(preset.w / img.width, preset.h / img.height) * (zoom / 100)
+    const s = Math.max(dims.w / img.width, dims.h / img.height) * (zoom / 100)
     const dw = img.width * s
     const dh = img.height * s
-    const dx = (preset.w - dw) / 2
-    const dy = (preset.h - dh) / 2 + (vposPct / 100) * preset.h
+    const dx = (dims.w - dw) / 2
+    const dy = (dims.h - dh) / 2 + (vposPct / 100) * dims.h
     ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(img, dx, dy, dw, dh)
 
     if (replaceBg) {
       try {
-        const id = ctx.getImageData(0, 0, preset.w, preset.h)
-        applyBgReplace(id.data, preset.w, preset.h, bgColor, threshold)
+        const id = ctx.getImageData(0, 0, dims.w, dims.h)
+        applyBgReplace(id.data, dims.w, dims.h, bgColor, threshold)
         ctx.putImageData(id, 0, 0)
       } catch (_) {}
     }
@@ -1113,7 +1275,7 @@ export default function App() {
     const kb  = kbOf(url)
     setOutputUrl(url)
     setOutputKB(kb)
-  }, [preset, bgColor, replaceBg, threshold, vposPct, zoom, processKey, quality])
+  }, [preset, mode, bgColor, replaceBg, threshold, vposPct, zoom, processKey, quality])
 
   const openFile = useCallback(() => fileRef.current?.click(), [])
 
@@ -1166,8 +1328,25 @@ export default function App() {
     a.remove()
   }, [outputUrl, preset.id, outputKB])
 
+  // Persist the theme choice and hand it to the UA so form controls / scrollbars follow.
+  useEffect(() => {
+    localStorage.setItem('snapfit-theme', dark ? 'dark' : 'light')
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+  }, [dark])
+
+  // Screens mount their own [data-reveal] nodes — re-arm the observer on each change.
+  useRevealOnScroll(screen)
+
   return (
     <div className={`shell${dark ? ' dark' : ''}`}>
+      {/* Ambient aurora + film grain — decorative, never interactive */}
+      <div className="sf-atmos" aria-hidden="true">
+        <span className="sf-blob sf-blob--a" />
+        <span className="sf-blob sf-blob--b" />
+        <span className="sf-blob sf-blob--c" />
+        <span className="sf-grain" />
+      </div>
+
       <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
 
       <Nav
@@ -1186,6 +1365,8 @@ export default function App() {
           onDragLeave={e => e.preventDefault()}
           onSelectPreset={(p) => { handleSelectPreset(p); openFile() }}
           onOpenPdf={() => setScreen('pdf')}
+          mode={mode}
+          onSetMode={setMode}
         />
       )}
 
@@ -1209,6 +1390,8 @@ export default function App() {
           onSetVpos={(e) => setVposPct(+e.target.value)}
           onSetZoom={(e) => setZoom(+e.target.value)}
           onSetQuality={(e) => setQuality(+e.target.value / 100)}
+          mode={mode}
+          onSetMode={setMode}
           onDownload={download}
           onGoHome={() => setScreen('home')}
           onUpload={openFile}
