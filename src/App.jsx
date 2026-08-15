@@ -875,9 +875,17 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
 
 function FaqItem({ q, a, idx }) {
   const [open, setOpen] = useState(false)
+  const ref = useRef(null)
   const id = `faq-${idx}`
+  // Toggle imperatively (instead of via the rendered className) so this doesn't
+  // clobber the `is-in` class the scroll-reveal IntersectionObserver adds to
+  // this same node outside React — otherwise clicking would re-render the
+  // className string without `is-in` and the item would snap back to opacity:0.
+  useEffect(() => {
+    ref.current?.classList.toggle('is-open', open)
+  }, [open])
   return (
-    <div className={`sf-faq${open ? ' is-open' : ''}`} data-reveal style={{ '--d': `${Math.min(idx, 5) * 40}ms` }}>
+    <div ref={ref} className="sf-faq" data-reveal style={{ '--d': `${Math.min(idx, 5) * 40}ms` }}>
       <button
         className="sf-faq-q"
         id={`${id}-q`}
