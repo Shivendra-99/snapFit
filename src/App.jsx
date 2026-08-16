@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, Fragment } from 'react'
 import './index.css'
 import * as pdfjsLib from 'pdfjs-dist'
+import { segmentSubject } from './segmentation'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -57,7 +58,9 @@ function hexToRgb(h) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
-function applyBgReplace(data, w, h, newHex, thr) {
+// `opacity` (0–1) scales how strongly the new color replaces the detected
+// background — 1 = full replace, lower values let the original show through.
+function applyBgReplace(data, w, h, newHex, thr, opacity = 1) {
   const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]]
   let tr = 0, tg = 0, tb = 0
   corners.forEach(([x, y]) => {
@@ -70,15 +73,47 @@ function applyBgReplace(data, w, h, newHex, thr) {
   for (let i = 0; i < data.length; i += 4) {
     const dr = data[i] - tr, dg = data[i + 1] - tg, db = data[i + 2] - tb
     const dist = Math.sqrt(dr * dr + dg * dg + db * db)
-    if (dist < thr) {
-      data[i] = nr; data[i + 1] = ng; data[i + 2] = nb
-    } else if (dist < soft) {
-      const t = (dist - thr) / (soft - thr)
-      data[i]     = Math.round(nr * (1 - t) + data[i]     * t)
-      data[i + 1] = Math.round(ng * (1 - t) + data[i + 1] * t)
-      data[i + 2] = Math.round(nb * (1 - t) + data[i + 2] * t)
+    let t = 0
+    if (dist < thr) t = opacity
+    else if (dist < soft) t = (1 - (dist - thr) / (soft - thr)) * opacity
+    if (t > 0) {
+      data[i]     = Math.round(nr * t + data[i]     * (1 - t))
+      data[i + 1] = Math.round(ng * t + data[i + 1] * (1 - t))
+      data[i + 2] = Math.round(nb * t + data[i + 2] * (1 - t))
     }
   }
+}
+
+// Composites `img` onto `ctx` using an AI-generated subject mask, drawn
+// through the exact same crop/zoom transform as the photo so the mask lines
+// up pixel-for-pixel. `opacity` (0–1) scales how strongly the background
+// pixels get replaced by newHex — 1 = full replace, lower values blend with
+// the original background instead of hiding it completely.
+function compositeWithMask(ctx, img, maskCanvas, dims, dx, dy, dw, dh, newHex, opacity = 1) {
+  ctx.drawImage(img, dx, dy, dw, dh)
+
+  const maskScaled = document.createElement('canvas')
+  maskScaled.width = dims.w
+  maskScaled.height = dims.h
+  const mctx = maskScaled.getContext('2d')
+  mctx.imageSmoothingQuality = 'high'
+  mctx.drawImage(maskCanvas, dx, dy, dw, dh)
+  const maskData = mctx.getImageData(0, 0, dims.w, dims.h)
+
+  const overlay = document.createElement('canvas')
+  overlay.width = dims.w
+  overlay.height = dims.h
+  const octx = overlay.getContext('2d')
+  octx.fillStyle = newHex
+  octx.fillRect(0, 0, dims.w, dims.h)
+  const overlayData = octx.getImageData(0, 0, dims.w, dims.h)
+
+  for (let i = 0; i < overlayData.data.length; i += 4) {
+    const bgConfidence = 255 - maskData.data[i] // how "background" this pixel is
+    overlayData.data[i + 3] = Math.round(bgConfidence * opacity)
+  }
+  octx.putImageData(overlayData, 0, 0)
+  ctx.drawImage(overlay, 0, 0)
 }
 
 function kbOf(url) {
@@ -909,10 +944,11 @@ function EditorPage({
   preset, onSelectPreset, onCustomField,
   imgSrc, outputUrl, outputKB, quality,
   mode, onSetMode,
-  bgColor, replaceBg, threshold, vposPct, zoom,
-  onToggleReplace, onSetBg, onSetThreshold, onSetVpos, onSetZoom, onSetQuality,
+  bgColor, replaceBg, threshold, bgOpacity, vposPct, zoom, segStatus,
+  onToggleReplace, onSetBg, onSetThreshold, onSetOpacity, onSetVpos, onSetZoom, onSetQuality,
   onDownload, onGoHome, onUpload,
 }) {
+  const aiActive = mode === 'photo' && segStatus === 'ready'
   const dims = mode === 'sig' ? preset.sig : preset
   const ok = outputKB >= dims.min && outputKB <= dims.max
   const box = 210
@@ -1166,6 +1202,16 @@ function EditorPage({
                 Replace
               </label>
             </div>
+            {replaceBg && mode === 'photo' && (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 12,
+                fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 99,
+                background: aiActive ? 'var(--tint)' : (segStatus === 'loading' ? 'var(--surface2)' : '#fef3c7'),
+                color: aiActive ? 'var(--green-ink)' : (segStatus === 'loading' ? 'var(--muted)' : '#b45309'),
+              }}>
+                {aiActive ? '✨ AI subject detection' : segStatus === 'loading' ? '⏳ Detecting subject…' : '⚠ Color-based fallback'}
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {BG_OPTIONS.map(b => (
                 <div key={b.hex} onClick={() => onSetBg(b.hex)} style={{ cursor: 'pointer', textAlign: 'center' }}>
@@ -1177,8 +1223,44 @@ function EditorPage({
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted)', marginTop: 5 }}>{b.name}</div>
                 </div>
               ))}
+              {(() => {
+                const isCustom = !BG_OPTIONS.some(b => b.hex === bgColor)
+                return (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{
+                      position: 'relative', width: 42, height: 42, borderRadius: 11, overflow: 'hidden',
+                      background: isCustom ? bgColor : 'conic-gradient(from 90deg, #ff5252, #ffb300, #66bb6a, #29b6f6, #7e57c2, #ff5252)',
+                      border: `2px solid ${isCustom ? 'var(--green)' : 'var(--line)'}`,
+                      boxShadow: '0 1px 4px var(--line)',
+                      display: 'grid', placeItems: 'center', cursor: 'pointer',
+                    }}>
+                      {!isCustom && <span style={{ fontSize: 18, fontWeight: 900, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,.55)' }}>+</span>}
+                      <input
+                        type="color"
+                        value={bgColor}
+                        onChange={(e) => onSetBg(e.target.value)}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 0, padding: 0 }}
+                        aria-label="Custom background color"
+                      />
+                    </div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted)', marginTop: 5 }}>Custom</div>
+                  </div>
+                )
+              })()}
             </div>
             {replaceBg && (
+              <div style={{ marginTop: 15 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
+                  <span>Background opacity</span>
+                  <span style={{ fontFamily: "'JetBrains Mono',monospace", color: 'var(--green-ink)' }}>{bgOpacity}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={bgOpacity} onChange={onSetOpacity} />
+                <div style={{ fontSize: 10.5, color: 'var(--faint)', fontWeight: 500, marginTop: 4 }}>
+                  Lower = let some of the original background show through.
+                </div>
+              </div>
+            )}
+            {replaceBg && !aiActive && (
               <div style={{ marginTop: 15 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
                   <span>Background sensitivity</span>
@@ -1234,6 +1316,7 @@ export default function App() {
   const [bgColor,   setBgColor]   = useState('#ffffff')
   const [replaceBg, setReplaceBg] = useState(true)
   const [threshold, setThreshold] = useState(70)
+  const [bgOpacity, setBgOpacity] = useState(100)
   const [vposPct,   setVposPct]   = useState(0)
   const [zoom,      setZoom]      = useState(100)
   const [outputUrl, setOutputUrl] = useState(null)
@@ -1241,10 +1324,13 @@ export default function App() {
   const [quality,   setQuality]   = useState(0.92)
   const [mode,      setMode]      = useState('photo')
   const [processKey, setProcessKey] = useState(0)
+  const [segStatus, setSegStatus] = useState('idle') // idle | loading | ready | error
 
   const fileRef  = useRef(null)
   const imgElRef = useRef(null)
   const canvasRef = useRef(null)
+  const segMaskRef = useRef(null)
+  const segTokenRef = useRef(0)
 
   // Re-run canvas processing whenever any parameter or image changes
   useEffect(() => {
@@ -1269,21 +1355,36 @@ export default function App() {
     const dx = (dims.w - dw) / 2
     const dy = (dims.h - dh) / 2 + (vposPct / 100) * dims.h
     ctx.imageSmoothingQuality = 'high'
-    ctx.drawImage(img, dx, dy, dw, dh)
 
-    if (replaceBg) {
+    // AI subject mask only makes sense for photo mode (a signature has no
+    // "person" for the segmenter to find) and only once it's ready. It draws
+    // its own subject+background composite, so skip the plain drawImage below
+    // — otherwise the opaque photo would sit underneath and mask through.
+    const useAiMask = replaceBg && mode === 'photo' && !!segMaskRef.current
+    const opacityFrac = bgOpacity / 100
+    if (useAiMask) {
       try {
-        const id = ctx.getImageData(0, 0, dims.w, dims.h)
-        applyBgReplace(id.data, dims.w, dims.h, bgColor, threshold)
-        ctx.putImageData(id, 0, 0)
-      } catch (_) {}
+        compositeWithMask(ctx, img, segMaskRef.current, dims, dx, dy, dw, dh, bgColor, opacityFrac)
+      } catch (err) {
+        console.warn('SnapFit: mask composite failed, falling back to plain photo', err)
+        ctx.drawImage(img, dx, dy, dw, dh)
+      }
+    } else {
+      ctx.drawImage(img, dx, dy, dw, dh)
+      if (replaceBg) {
+        try {
+          const id = ctx.getImageData(0, 0, dims.w, dims.h)
+          applyBgReplace(id.data, dims.w, dims.h, bgColor, threshold, opacityFrac)
+          ctx.putImageData(id, 0, 0)
+        } catch (err) { console.warn('SnapFit: color-based background replace failed', err) }
+      }
     }
 
     const url = canvas.toDataURL('image/jpeg', quality)
     const kb  = kbOf(url)
     setOutputUrl(url)
     setOutputKB(kb)
-  }, [preset, mode, bgColor, replaceBg, threshold, vposPct, zoom, processKey, quality])
+  }, [preset, mode, bgColor, replaceBg, threshold, bgOpacity, vposPct, zoom, processKey, quality, segStatus])
 
   const openFile = useCallback(() => fileRef.current?.click(), [])
 
@@ -1295,9 +1396,25 @@ export default function App() {
       const img = new Image()
       img.onload = () => {
         imgElRef.current = img
+        segMaskRef.current = null
+        setSegStatus('loading')
         setImgSrc(src)
         setScreen('editor')
         setProcessKey(k => k + 1)
+
+        // Segment once per uploaded photo (not on every slider tweak); the
+        // model itself is downloaded once per browser and cached after that.
+        const token = ++segTokenRef.current
+        segmentSubject(img).then(maskCanvas => {
+          if (segTokenRef.current !== token) return // a newer photo was uploaded meanwhile
+          segMaskRef.current = maskCanvas
+          setSegStatus('ready')
+          setProcessKey(k => k + 1)
+        }).catch(err => {
+          if (segTokenRef.current !== token) return
+          console.warn('SnapFit: AI background detection unavailable, using color-based fallback', err)
+          setSegStatus('error')
+        })
       }
       img.src = src
     }
@@ -1390,11 +1507,14 @@ export default function App() {
           bgColor={bgColor}
           replaceBg={replaceBg}
           threshold={threshold}
+          bgOpacity={bgOpacity}
           vposPct={vposPct}
           zoom={zoom}
+          segStatus={segStatus}
           onToggleReplace={() => setReplaceBg(r => !r)}
           onSetBg={(hex) => setBgColor(hex)}
           onSetThreshold={(e) => setThreshold(+e.target.value)}
+          onSetOpacity={(e) => setBgOpacity(+e.target.value)}
           onSetVpos={(e) => setVposPct(+e.target.value)}
           onSetZoom={(e) => setZoom(+e.target.value)}
           onSetQuality={(e) => setQuality(+e.target.value / 100)}
