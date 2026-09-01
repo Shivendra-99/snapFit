@@ -893,6 +893,41 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
         </div>
       </section>
 
+      {/* ── SEO DIRECTORY — real links into the static landing pages ─────── */}
+      <section className="sf-container" style={{ paddingBlock: 'clamp(24px,4vw,44px)', borderTop: '1px solid var(--line)' }}>
+        <h2 className="sf-h2" style={{ marginBottom: 6 }} data-reveal>Photo sizes for every exam &amp; marketplace</h2>
+        <p style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 500, marginBottom: 22 }} data-reveal>
+          Jump straight to the exact spec you need — each page has the dimensions, KB limit and the free tool.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 'clamp(18px,3vw,32px)' }}>
+          <div id="exams" data-reveal>
+            <div className="sf-dir-h">Exam photo size</div>
+            <div className="sf-dir-links">
+              {PRESETS.filter(p => p.id !== 'custom').map(p => (
+                <a key={p.id} href={`/exam/${p.id}/`}>{p.name.split(',')[0]} photo — {p.w}×{p.h}</a>
+              ))}
+              <a href="/signature/">Exam signature size</a>
+            </div>
+          </div>
+          <div id="sell" data-reveal>
+            <div className="sf-dir-h">Marketplace listing photo</div>
+            <div className="sf-dir-links">
+              {MARKETPLACE_PRESETS.map(m => (
+                <a key={m.id} href={`/sell/${m.id}/`}>{m.name} — {m.w}×{m.h}</a>
+              ))}
+            </div>
+          </div>
+          <div id="compress" data-reveal>
+            <div className="sf-dir-h">Compress to exact KB</div>
+            <div className="sf-dir-links">
+              {[10, 15, 20, 30, 40, 50, 100, 150, 200].map(kb => (
+                <a key={kb} href={`/compress/${kb}kb/`}>Compress photo to {kb} KB</a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer className="sf-container" style={{ borderTop: '1px solid var(--line)', paddingBlock: 28, display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ fontSize: 12, color: 'var(--faint)', fontWeight: 500, maxWidth: '62ch' }}>
           © 2026 SnapFit · Photos processed locally, never uploaded · Not affiliated with NTA, UPSC, SSC or any examination body.
@@ -1334,7 +1369,8 @@ function readDeepLink() {
   }
   if (examId) {
     const p = PRESETS.find(e => e.id === examId)
-    if (p) return { tool: 'exam', preset: p, bg: p.bg }
+    // /?exam=<id>&sig=1 opens straight into signature mode (from /signature/).
+    if (p) return { tool: 'exam', preset: p, bg: p.bg, mode: q.get('sig') ? 'sig' : 'photo' }
   }
   return null
 }
@@ -1359,7 +1395,7 @@ export default function App() {
   const [outputUrl, setOutputUrl] = useState(null)
   const [outputKB,  setOutputKB]  = useState(0)
   const [quality,   setQuality]   = useState(0.92)
-  const [mode,      setMode]      = useState('photo')
+  const [mode,      setMode]      = useState(DEEP_LINK?.mode ?? 'photo')
   const [processKey, setProcessKey] = useState(0)
   const [segStatus, setSegStatus] = useState('idle') // idle | loading | ready | error
 

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f1c14"/>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <defs><radialGradient id="g" cx="20%" cy="0%" r="90%"><stop offset="0%" stop-color="#15803d" stop-opacity=".38"/><stop offset="60%" stop-color="#0f1c14" stop-opacity="0"/></radialGradient></defs>
+  <g transform="translate(90,150)">
+    <rect width="86" height="86" rx="22" fill="#15803d"/>
+    <g transform="translate(20,24)" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"><rect x="0" y="6" width="46" height="34" rx="7"/><circle cx="23" cy="24" r="9"/></g>
+    <text x="110" y="60" font-family="Segoe UI,Arial,sans-serif" font-size="52" font-weight="700" fill="#fff">SnapFit</text>
+    <text x="112" y="150" font-family="Segoe UI,Arial,sans-serif" font-size="60" font-weight="800" fill="#fff">Exam &amp; marketplace photos,</text>
+    <text x="112" y="222" font-family="Segoe UI,Arial,sans-serif" font-size="60" font-weight="800" fill="#7ee0a6">sized to spec in seconds.</text>
+    <text x="112" y="300" font-family="Segoe UI,Arial,sans-serif" font-size="30" fill="#b9c7bd">Free · 100% in your browser · no upload · no sign-up</text>
+  </g>
+</svg>

@@ -528,6 +528,30 @@ h1, h2, h3, h4, .sf-display {
 .upload-area:hover  { border-color: var(--green); box-shadow: var(--sh-4); }
 .upload-area:active { transform: perspective(1100px) scale(.985); transition-duration: var(--dur-1); }
 
+/* SEO directory — internal links into the static landing pages */
+.sf-dir-h {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--green-ink);
+  margin-bottom: 12px;
+}
+.sf-dir-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sf-dir-links a {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--dur-2) var(--ease);
+}
+.sf-dir-links a:hover { color: var(--green); }
+.sf-dir-links a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 4px; }
+
 /* SnapFit Studio promo band on the home page */
 .sf-studio-promo {
   cursor: pointer;
