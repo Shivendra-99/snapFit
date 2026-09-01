@@ -528,6 +528,32 @@ h1, h2, h3, h4, .sf-display {
 .upload-area:hover  { border-color: var(--green); box-shadow: var(--sh-4); }
 .upload-area:active { transform: perspective(1100px) scale(.985); transition-duration: var(--dur-1); }
 
+/* SnapFit Studio promo band on the home page */
+.sf-studio-promo {
+  cursor: pointer;
+  padding: clamp(16px, 2.4vw, 22px) clamp(18px, 2.6vw, 26px);
+  border-radius: var(--r-2xl);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--sh-3);
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0);
+  transition:
+    transform var(--dur-4) var(--ease-out),
+    border-color var(--dur-3) var(--ease),
+    box-shadow var(--dur-3) var(--ease-out);
+}
+.sf-studio-promo:hover {
+  border-color: var(--amber);
+  box-shadow: var(--sh-4);
+}
+.sf-studio-promo:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-studio-promo { transform: none !important; }
+}
+
 /* Spotlight that follows the cursor across the surface */
 .upload-area::before {
   content: '';

@@ -2,54 +2,11 @@ import { useState, useRef, useEffect, useCallback, Fragment } from 'react'
 import './index.css'
 import * as pdfjsLib from 'pdfjs-dist'
 import { segmentSubject } from './segmentation'
+import { PRESETS, CUSTOM_BASE, BG_OPTIONS, MARKETPLACE_PRESETS } from './presets'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
 ).href
-
-// ─── Preset groups ────────────────────────────────────────────────────────────
-// G = colour group: green | orange | blue | navy | purple
-const G = {
-  green:  { tint: '#eaf6ee', ink: '#15803d' },
-  orange: { tint: '#fdeede', ink: '#c4730e' },
-  blue:   { tint: '#e7eefb', ink: '#2f5fc4' },
-  navy:   { tint: '#edf4ff', ink: '#1d5fa8' },
-  purple: { tint: '#f3f0ff', ink: '#6d28d9' },
-}
-
-const PRESETS = [
-  // ── 200×230, 10–200 KB  (NEET / JEE / CUET share identical specs) ────
-  { id: 'neet',   name: 'NEET, JEE, CUET',                    abbr: 'NEET+', w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 30  } },
-  // ── 200×230, 10–100 KB ───────────────────────────────────────────────
-  { id: 'ugcnet', name: 'UGC NET / SET',                       abbr: 'NET',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 100, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 30  } },
-  // ── 200×230, 10–50 KB ────────────────────────────────────────────────
-  { id: 'mpsc',   name: 'MPSC / UPPSC',                        abbr: 'PSC',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 50,  ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
-  // ── 200×230, 20–50 KB  (SSC / CTET / Banking share identical specs) ──
-  { id: 'ssc',    name: 'SSC, CTET, IBPS, SBI, RBI, LIC',     abbr: 'SSC+',  w: 200, h: 230, bg: '#ffffff', min: 20,  max: 50,  ...G.orange, sig: { w: 200, h: 80,  min: 10, max: 20  } },
-  // ── Others – unique dimensions ────────────────────────────────────────
-  { id: 'gate',   name: 'GATE',                                abbr: 'GATE',  w: 240, h: 320, bg: '#ffffff', min: 5,   max: 200, ...G.green,  sig: { w: 200, h: 100, min: 4,  max: 200 } },
-  { id: 'cat',    name: 'CAT (IIM)',                           abbr: 'CAT',   w: 100, h: 130, bg: '#ffffff', min: 10,  max: 50,  ...G.blue,   sig: { w: 150, h: 75,  min: 10, max: 50  } },
-  { id: 'upsc',   name: 'UPSC CSE',                           abbr: 'UPSC',  w: 350, h: 350, bg: '#ffffff', min: 20,  max: 300, ...G.green,  sig: { w: 200, h: 100, min: 10, max: 100 } },
-  { id: 'bpsc',   name: 'BPSC',                               abbr: 'BPSC',  w: 215, h: 265, bg: '#ffffff', min: 10,  max: 50,  ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
-  { id: 'tnpsc',  name: 'TNPSC',                              abbr: 'TN',    w: 150, h: 200, bg: '#ffffff', min: 10,  max: 40,  ...G.orange, sig: { w: 200, h: 80,  min: 10, max: 40  } },
-  { id: 'rrb',    name: 'RRB / NTPC',                         abbr: 'RRB',   w: 130, h: 160, bg: '#ffffff', min: 15,  max: 40,  ...G.orange, sig: { w: 140, h: 60,  min: 10, max: 40  } },
-  // ── 200×240, 10–50 KB  (NDA / CDS / AFCAT near-identical) ───────────
-  { id: 'nda',    name: 'NDA, CDS, AFCAT',                    abbr: 'NDA+',  w: 200, h: 240, bg: '#ffffff', min: 10,  max: 50,  ...G.navy,   sig: { w: 200, h: 100, min: 10, max: 50  } },
-  // ── ID Documents ─────────────────────────────────────────────────────
-  { id: 'pass',   name: 'Passport 35×45',                     abbr: 'PP',    w: 413, h: 531, bg: '#ffffff', min: 20,  max: 100, ...G.orange, sig: { w: 200, h: 100, min: 10, max: 50  } },
-  { id: 'visa',   name: 'US Visa 2×2"',                       abbr: 'VISA',  w: 600, h: 600, bg: '#ffffff', min: 100, max: 240, ...G.navy,   sig: { w: 200, h: 100, min: 10, max: 50  } },
-  // ── Custom ────────────────────────────────────────────────────────────
-  { id: 'custom', name: 'Custom',                              abbr: 'ANY',   w: 200, h: 230, bg: '#ffffff', min: 10,  max: 200, ...G.purple, sig: { w: 200, h: 100, min: 4,  max: 50  } },
-]
-
-const CUSTOM_BASE = PRESETS.find(p => p.id === 'custom')
-
-const BG_OPTIONS = [
-  { hex: '#ffffff', name: 'White' },
-  { hex: '#eef3fb', name: 'Off-white' },
-  { hex: '#cfe0fb', name: 'Lt blue' },
-  { hex: '#2f6fdb', name: 'Blue' },
-]
 
 function hexToRgb(h) {
   h = h.replace('#', '')
@@ -589,10 +546,15 @@ const Ico = {
       <path d="M12 2.7l7.5 3v5.6c0 4.6-3.1 8.6-7.5 10-4.4-1.4-7.5-5.4-7.5-10V5.7z" /><path d="M9 12l2.2 2.2L15.4 10" />
     </svg>
   ),
+  tag: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <path d="M3.6 3.6h6l10.8 10.8a2 2 0 0 1 0 2.8l-3.2 3.2a2 2 0 0 1-2.8 0L3.6 9.6z" /><circle cx="7.5" cy="7.5" r="1.3" />
+    </svg>
+  ),
 }
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
-function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf }) {
+function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenStudio }) {
   const stuck = useScrolled()
 
   return (
@@ -621,6 +583,11 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf }) {
           {dark ? <Ico.sun width="18" height="18" /> : <Ico.moon width="18" height="18" />}
         </Btn>
 
+        <Btn onClick={onOpenStudio} className="sf-hide-sm">
+          <Ico.tag width="15" height="15" />
+          Listing photos
+        </Btn>
+
         <Btn onClick={onOpenPdf} className="sf-hide-sm">
           <Ico.file width="15" height="15" />
           Compress PDF
@@ -638,7 +605,7 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf }) {
 // ─── Home Page ────────────────────────────────────────────────────────────────
 const HERO_WORDS = ['Exam', 'photo', '&', 'PDF,', 'sorted', 'in']
 
-function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, mode, onSetMode }) {
+function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, onOpenStudio, mode, onSetMode }) {
   const [dragging, setDragging] = useState(false)
   const presetCount = useCountUp(20)
 
@@ -754,6 +721,38 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STUDIO PROMO ────────────────────────────────────────────────── */}
+      <section className="sf-container" style={{ paddingBlock: 'clamp(6px,2vw,14px)' }}>
+        <div
+          data-reveal
+          role="button"
+          tabIndex={0}
+          onClick={onOpenStudio}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudio() } }}
+          onPointerMove={e => trackPointer(e, 3)}
+          onPointerLeave={releasePointer}
+          className="sf-studio-promo"
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ width: 46, height: 46, borderRadius: 13, background: 'var(--amber-tint)', color: 'var(--amber)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <Ico.tag width="22" height="22" />
+            </span>
+            <div style={{ flex: '1 1 260px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 3, flexWrap: 'wrap' }}>
+                <span className="sf-display" style={{ fontWeight: 700, fontSize: 17 }}>Selling online?</span>
+                <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--amber)', background: 'var(--amber-tint)', padding: '3px 8px', borderRadius: 99 }}>New · Studio</span>
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 500, lineHeight: 1.5 }}>
+                Listing-ready product photos for Meesho, Amazon.in, Flipkart, Myntra &amp; ONDC — background removed to pure white, sized to each marketplace’s exact spec.
+              </div>
+            </div>
+            <span className="sf-drop-cta" style={{ flexShrink: 0 }}>
+              Make a listing photo <Ico.arrow width="15" height="15" />
+            </span>
           </div>
         </div>
       </section>
@@ -947,7 +946,11 @@ function EditorPage({
   bgColor, replaceBg, threshold, bgOpacity, vposPct, zoom, segStatus,
   onToggleReplace, onSetBg, onSetThreshold, onSetOpacity, onSetVpos, onSetZoom, onSetQuality,
   onDownload, onGoHome, onUpload,
+  variant = 'exam', presetList = PRESETS,
 }) {
+  const isStudio = variant === 'studio'
+  // Studio outputs are always product photos — no signature sub-mode.
+  const whiteBgOk = replaceBg && bgColor.toLowerCase() === '#ffffff'
   const aiActive = mode === 'photo' && segStatus === 'ready'
   const dims = mode === 'sig' ? preset.sig : preset
   const ok = outputKB >= dims.min && outputKB <= dims.max
@@ -981,7 +984,7 @@ function EditorPage({
         </button>
 
         <div style={{ fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: 'var(--muted)', fontWeight: 600, fontSize: 13 }}>Editing for</span>
+          <span style={{ color: 'var(--muted)', fontWeight: 600, fontSize: 13 }}>{isStudio ? 'Listing photo for' : 'Editing for'}</span>
           {preset.name}
         </div>
 
@@ -1023,7 +1026,7 @@ function EditorPage({
               {/* Output */}
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--green-ink)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>
-                  Exam-ready
+                  {isStudio ? 'Listing-ready' : 'Exam-ready'}
                 </div>
                 <div style={{ background: 'var(--tint)', borderRadius: 12, padding: 8, display: 'inline-block', boxShadow: '0 0 0 2px rgba(21,128,61,.18)' }}>
                   {outputUrl && (
@@ -1048,8 +1051,14 @@ function EditorPage({
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: sizeBg, padding: '8px 13px', borderRadius: 10 }}>
                 <span style={{ width: 18, height: 18, borderRadius: 99, background: sizeDot, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>{sizeMark}</span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: sizeInk }}>{outputKB} KB · target {dims.min}–{dims.max}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: sizeInk }}>{outputKB} KB · {isStudio ? `under ${dims.max}` : `target ${dims.min}–${dims.max}`}</span>
               </div>
+              {isStudio && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: whiteBgOk ? 'var(--tint)' : '#fdeede', padding: '8px 13px', borderRadius: 10 }}>
+                  <span style={{ width: 18, height: 18, borderRadius: 99, background: whiteBgOk ? '#16a34a' : '#e08a1e', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>{whiteBgOk ? '✓' : '!'}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: whiteBgOk ? 'var(--green-ink)' : '#b8650c' }}>{whiteBgOk ? 'Pure white background' : 'Set white background'}</span>
+                </div>
+              )}
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--tint)', padding: '8px 13px', borderRadius: 10 }}>
                 <span style={{ width: 18, height: 18, borderRadius: 99, background: '#16a34a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>✓</span>
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--green-ink)' }}>JPEG format</span>
@@ -1087,14 +1096,15 @@ function EditorPage({
               <path d="M12 4v12M7 11l5 5 5-5" />
               <path d="M5 20h14" />
             </svg>
-            Download exam photo ({outputKB} KB)
+            Download {isStudio ? 'listing' : 'exam'} photo ({outputKB} KB)
           </button>
         </div>
 
         {/* CONTROLS PANEL */}
         <div style={{ flex: '0 1 360px', minWidth: 280, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Photo / Signature toggle */}
+          {/* Photo / Signature toggle — exam tool only */}
+          {!isStudio && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
               {mode === 'sig' ? 'Signature mode' : 'Photo mode'}
@@ -1116,15 +1126,21 @@ function EditorPage({
               ))}
             </div>
           </div>
+          )}
 
-          {/* Exam preset */}
+          {/* Preset picker */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
-            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: isStudio ? 4 : 13, display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
-              Exam preset
+              {isStudio ? 'Marketplace' : 'Exam preset'}
             </div>
+            {isStudio && (
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', marginBottom: 13, lineHeight: 1.45 }}>
+                {preset.note}
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, maxHeight: 260, overflowY: 'auto', paddingRight: 2 }}>
-              {PRESETS.map(p => {
+              {presetList.map(p => {
                 const sel = p.id === preset.id
                 return (
                   <div key={p.id} onClick={() => onSelectPreset(p)} style={{
@@ -1278,7 +1294,7 @@ function EditorPage({
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: 18 }}>
             <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 6, height: 6, borderRadius: 99, background: 'var(--green)', display: 'inline-block' }} />
-              Face framing
+              {isStudio ? 'Product framing' : 'Face framing'}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
               <span>Vertical position</span>
@@ -1303,6 +1319,27 @@ function EditorPage({
   )
 }
 
+// Deep links from the static SEO landing pages: /?exam=<id> or /?studio=<id>
+// preselect the matching preset & tool so a visitor arriving from a landing
+// page lands on the uploader already configured for that exam or marketplace.
+// Read once at module load and fed into the initial state below.
+function readDeepLink() {
+  if (typeof window === 'undefined') return null
+  const q = new URLSearchParams(window.location.search)
+  const studioId = q.get('studio')
+  const examId   = q.get('exam')
+  if (studioId) {
+    const p = MARKETPLACE_PRESETS.find(m => m.id === studioId)
+    if (p) return { tool: 'studio', preset: p, bg: '#ffffff' }
+  }
+  if (examId) {
+    const p = PRESETS.find(e => e.id === examId)
+    if (p) return { tool: 'exam', preset: p, bg: p.bg }
+  }
+  return null
+}
+const DEEP_LINK = readDeepLink()
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen,    setScreen]    = useState('home')
@@ -1312,8 +1349,8 @@ export default function App() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
   const [imgSrc,    setImgSrc]    = useState(null)
-  const [preset,    setPreset]    = useState(PRESETS[0])
-  const [bgColor,   setBgColor]   = useState('#ffffff')
+  const [preset,    setPreset]    = useState(DEEP_LINK?.preset ?? PRESETS[0])
+  const [bgColor,   setBgColor]   = useState(DEEP_LINK?.bg ?? '#ffffff')
   const [replaceBg, setReplaceBg] = useState(true)
   const [threshold, setThreshold] = useState(70)
   const [bgOpacity, setBgOpacity] = useState(100)
@@ -1331,6 +1368,7 @@ export default function App() {
   const canvasRef = useRef(null)
   const segMaskRef = useRef(null)
   const segTokenRef = useRef(0)
+  const toolRef  = useRef(DEEP_LINK?.tool ?? 'exam') // 'exam' | 'studio' — which editor to open after upload
 
   // Re-run canvas processing whenever any parameter or image changes
   useEffect(() => {
@@ -1349,7 +1387,10 @@ export default function App() {
     ctx.fillStyle = bgColor
     ctx.fillRect(0, 0, dims.w, dims.h)
 
-    const s = Math.max(dims.w / img.width, dims.h / img.height) * (zoom / 100)
+    // Products (fit:'contain') are scaled to sit fully inside the frame with
+    // white padding; face/exam photos (default 'cover') fill and crop.
+    const fitFn = preset.fit === 'contain' ? Math.min : Math.max
+    const s = fitFn(dims.w / img.width, dims.h / img.height) * (zoom / 100)
     const dw = img.width * s
     const dh = img.height * s
     const dx = (dims.w - dw) / 2
@@ -1388,6 +1429,25 @@ export default function App() {
 
   const openFile = useCallback(() => fileRef.current?.click(), [])
 
+  // Open the exam tool (default) — upload lands on the exam editor.
+  const uploadExam = useCallback(() => {
+    toolRef.current = 'exam'
+    openFile()
+  }, [openFile])
+
+  // Open SnapFit Studio — seed a marketplace preset + pure-white background,
+  // then upload lands on the same editor in its 'studio' variant.
+  const openStudio = useCallback(() => {
+    toolRef.current = 'studio'
+    setMode('photo')
+    // Keep an already-chosen marketplace preset (e.g. from a /?studio=meesho
+    // deep link); only default to the first when coming from an exam preset.
+    setPreset(prev => (prev && prev.fit === 'contain' ? prev : MARKETPLACE_PRESETS[0]))
+    setBgColor('#ffffff')
+    setReplaceBg(true)
+    openFile()
+  }, [openFile])
+
   const loadFile = useCallback((file) => {
     if (!file?.type?.startsWith('image/')) return
     const reader = new FileReader()
@@ -1399,7 +1459,7 @@ export default function App() {
         segMaskRef.current = null
         setSegStatus('loading')
         setImgSrc(src)
-        setScreen('editor')
+        setScreen(toolRef.current === 'studio' ? 'studio' : 'editor')
         setProcessKey(k => k + 1)
 
         // Segment once per uploaded photo (not on every slider tweak); the
@@ -1445,13 +1505,14 @@ export default function App() {
 
   const download = useCallback(() => {
     if (!outputUrl) return
+    const kind = screen === 'studio' ? 'listing' : 'exam'
     const a = document.createElement('a')
     a.href     = outputUrl
-    a.download = `${preset.id}_exam_photo_${outputKB}kb.jpg`
+    a.download = `${preset.id}_${kind}_photo_${outputKB}kb.jpg`
     document.body.appendChild(a)
     a.click()
     a.remove()
-  }, [outputUrl, preset.id, outputKB])
+  }, [outputUrl, preset.id, outputKB, screen])
 
   // Persist the theme choice and hand it to the UA so form controls / scrollbars follow.
   useEffect(() => {
@@ -1477,19 +1538,21 @@ export default function App() {
       <Nav
         dark={dark}
         onToggleDark={() => setDark(d => !d)}
-        onUpload={openFile}
+        onUpload={uploadExam}
         onGoHome={() => setScreen('home')}
         onOpenPdf={() => setScreen('pdf')}
+        onOpenStudio={openStudio}
       />
 
       {screen === 'home' && (
         <HomePage
-          onUpload={openFile}
-          onDrop={handleDrop}
+          onUpload={uploadExam}
+          onDrop={(e) => { toolRef.current = 'exam'; handleDrop(e) }}
           onDragOver={e => e.preventDefault()}
           onDragLeave={e => e.preventDefault()}
-          onSelectPreset={(p) => { handleSelectPreset(p); openFile() }}
+          onSelectPreset={(p) => { toolRef.current = 'exam'; handleSelectPreset(p); openFile() }}
           onOpenPdf={() => setScreen('pdf')}
+          onOpenStudio={openStudio}
           mode={mode}
           onSetMode={setMode}
         />
@@ -1497,6 +1560,39 @@ export default function App() {
 
       {screen === 'editor' && (
         <EditorPage
+          preset={preset}
+          onSelectPreset={handleSelectPreset}
+          onCustomField={handleCustomField}
+          imgSrc={imgSrc}
+          outputUrl={outputUrl}
+          outputKB={outputKB}
+          quality={quality}
+          bgColor={bgColor}
+          replaceBg={replaceBg}
+          threshold={threshold}
+          bgOpacity={bgOpacity}
+          vposPct={vposPct}
+          zoom={zoom}
+          segStatus={segStatus}
+          onToggleReplace={() => setReplaceBg(r => !r)}
+          onSetBg={(hex) => setBgColor(hex)}
+          onSetThreshold={(e) => setThreshold(+e.target.value)}
+          onSetOpacity={(e) => setBgOpacity(+e.target.value)}
+          onSetVpos={(e) => setVposPct(+e.target.value)}
+          onSetZoom={(e) => setZoom(+e.target.value)}
+          onSetQuality={(e) => setQuality(+e.target.value / 100)}
+          mode={mode}
+          onSetMode={setMode}
+          onDownload={download}
+          onGoHome={() => setScreen('home')}
+          onUpload={openFile}
+        />
+      )}
+
+      {screen === 'studio' && (
+        <EditorPage
+          variant="studio"
+          presetList={MARKETPLACE_PRESETS}
           preset={preset}
           onSelectPreset={handleSelectPreset}
           onCustomField={handleCustomField}
