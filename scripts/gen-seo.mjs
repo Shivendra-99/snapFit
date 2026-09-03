@@ -14,6 +14,7 @@ import {
   MARKETPLACE_PRESETS, EXAMS, KB_TARGETS, EXAM_KW,
   examKey, sellKey, kbKey, sigKey,
 } from './seo-copy-lib.mjs'
+import { AD_CLIENT, AD_SLOTS } from '../src/adConfig.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT   = resolve(__dirname, '..')
@@ -30,6 +31,12 @@ const MB_TARGETS = [1, 2]
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const att = (s) => esc(s).replace(/"/g, '&quot;')
+
+// A responsive AdSense display unit — renders nothing until a slot is configured
+// in src/adConfig.js (so pages stay clean before AdSense approval).
+const adUnit = (slot) => !slot ? '' : `
+    <ins class="adsbygoogle" style="display:block;margin:26px 0" data-ad-client="${AD_CLIENT}" data-ad-slot="${slot}" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>`
 
 // ─── Shared JSON-LD helpers ───────────────────────────────────────────────────
 const softwareApp = () => ({
@@ -147,6 +154,7 @@ function pageHtml({ url, title, description, h1, crumbs, jsonld, body }) {
     <nav class="crumbs">${crumbNav}</nav>
     <h1>${esc(h1)}</h1>
     ${body}
+    ${adUnit(AD_SLOTS.landing)}
     ${CLOUD}
   </main>
   <footer class="wrap">

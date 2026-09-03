@@ -4,6 +4,7 @@ import * as pdfjsLib from 'pdfjs-dist'
 import { segmentSubject } from './segmentation'
 import { PRESETS, CUSTOM_BASE, BG_OPTIONS, MARKETPLACE_PRESETS } from './presets'
 import { extractSpecFromImage, specToPreset, BG_LABEL } from './extractSpec'
+import { AD_CLIENT, AD_SLOTS } from './adConfig'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -1406,6 +1407,8 @@ function EditorPage({
 
         </div>
       </div>
+
+      <AdUnit slot={AD_SLOTS.editor} style={{ marginTop: 28 }} />
     </div>
   )
 }
@@ -1532,6 +1535,27 @@ function specBg(spec) {
   if (w.includes('light') && w.includes('blue')) return '#cfe0fb'
   if (w.includes('blue')) return '#2f6fdb'
   return '#ffffff'
+}
+
+// ─── AdSense unit ───────────────────────────────────────────────────────────────
+// Renders nothing until a slot is set in adConfig.js (clean before approval).
+// The adsbygoogle loader is already in index.html; here we just push per unit.
+function AdUnit({ slot, style }) {
+  useEffect(() => {
+    if (!slot) return
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}) } catch { /* loader not ready */ }
+  }, [slot])
+  if (!slot) return null
+  return (
+    <ins
+      className="adsbygoogle"
+      style={{ display: 'block', ...style }}
+      data-ad-client={AD_CLIENT}
+      data-ad-slot={slot}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    />
+  )
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
