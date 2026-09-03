@@ -929,6 +929,14 @@ input[type="range"]::-moz-range-thumb {
 .sf-spin { animation: spin 900ms linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Circular loading spinner (notice-screenshot reader, etc.) */
+.sf-spinner {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--green-ink);
+  animation: spin 800ms linear infinite;
+}
+
 /* ─── Reduced motion ────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {

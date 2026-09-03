@@ -3,6 +3,7 @@ import './index.css'
 import * as pdfjsLib from 'pdfjs-dist'
 import { segmentSubject } from './segmentation'
 import { PRESETS, CUSTOM_BASE, BG_OPTIONS, MARKETPLACE_PRESETS } from './presets'
+import { extractSpecFromImage, specToPreset, BG_LABEL } from './extractSpec'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -605,7 +606,7 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenStudio }
 // ─── Home Page ────────────────────────────────────────────────────────────────
 const HERO_WORDS = ['Exam', 'photo', '&', 'PDF,', 'sorted', 'in']
 
-function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, onOpenStudio, mode, onSetMode }) {
+function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, onOpenStudio, onAutoFill, noticeBusy, mode, onSetMode }) {
   const [dragging, setDragging] = useState(false)
   const presetCount = useCountUp(20)
 
@@ -759,6 +760,41 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
 
       {/* ── PRESETS ─────────────────────────────────────────────────────── */}
       <section className="sf-container" style={{ paddingBlock: 'clamp(18px,3vw,32px) clamp(28px,4vw,52px)' }}>
+        {/* Auto-fill: read the exam's photo spec straight off a notification screenshot */}
+        <div
+          data-reveal
+          role="button"
+          tabIndex={0}
+          aria-label="Auto-fill the size from an exam notification screenshot"
+          aria-busy={noticeBusy}
+          onClick={() => !noticeBusy && onAutoFill?.()}
+          onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !noticeBusy) { e.preventDefault(); onAutoFill?.() } }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+            border: '1px dashed var(--green-ink)', background: 'var(--tint)',
+            borderRadius: 16, padding: '16px 18px', marginBottom: 20,
+            cursor: noticeBusy ? 'progress' : 'pointer', opacity: noticeBusy ? 0.7 : 1,
+          }}
+        >
+          <span style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--surface)', color: 'var(--green-ink)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <Ico.file width="20" height="20" />
+          </span>
+          <div style={{ flex: '1 1 240px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 3, flexWrap: 'wrap' }}>
+              <span className="sf-display" style={{ fontWeight: 700, fontSize: 15.5 }}>
+                {noticeBusy ? 'Reading your screenshot…' : 'Not sure of the size? Auto-fill from a notice'}
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--green-ink)', background: 'var(--surface)', padding: '3px 8px', borderRadius: 99 }}>Beta · AI</span>
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--muted)', fontWeight: 500, lineHeight: 1.5 }}>
+              Upload a screenshot of the exam notification and we’ll read the photo &amp; signature size for you. Only the screenshot is sent for reading — your photo stays on your device.
+            </div>
+          </div>
+          <span className="sf-drop-cta" style={{ flexShrink: 0 }}>
+            {noticeBusy ? 'Working…' : <>Upload notice <Ico.arrow width="15" height="15" /></>}
+          </span>
+        </div>
+
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 14, marginBottom: 22 }} data-reveal>
           <div>
             <h2 className="sf-h2" style={{ marginBottom: 5 }}>Pick your exam</h2>
@@ -1376,6 +1412,108 @@ function readDeepLink() {
 }
 const DEEP_LINK = readDeepLink()
 
+// ─── Notice-screenshot review overlay ───────────────────────────────────────────
+// Shows a spinner while the model reads, then an EDITABLE card of what it found
+// (OCR can misread a digit, so nothing is applied until the user confirms).
+function NoticeReview({ state, spec, error, onEdit, onApply, onClose }) {
+  if (state === 'idle') return null
+
+  const overlay = {
+    position: 'fixed', inset: 0, zIndex: 200, display: 'grid', placeItems: 'center',
+    background: 'rgba(8,14,10,.55)', backdropFilter: 'blur(3px)', padding: 18,
+  }
+  const card = {
+    width: 'min(440px,100%)', background: 'var(--surface)', border: '1px solid var(--line)',
+    borderRadius: 18, padding: '22px 22px 20px', boxShadow: '0 24px 60px -18px rgba(0,0,0,.5)',
+  }
+  const numField = (block, key, label) => (
+    <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <span style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', fontWeight: 700 }}>{label}</span>
+      <input
+        type="number" min="1"
+        value={spec?.[block]?.[key] ?? ''}
+        onChange={e => onEdit(block, key, e.target.value)}
+        style={{ width: '100%', padding: '9px 11px', borderRadius: 9, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontSize: 14, fontWeight: 600 }}
+      />
+    </label>
+  )
+
+  return (
+    <div style={overlay} role="dialog" aria-modal="true" onClick={onClose}>
+      <div style={card} onClick={e => e.stopPropagation()}>
+        {state === 'reading' && (
+          <div style={{ textAlign: 'center', padding: '18px 0' }}>
+            <div className="sf-spinner" style={{ margin: '0 auto 16px' }} />
+            <div className="sf-display" style={{ fontWeight: 700, fontSize: 16 }}>Reading your notification…</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>Finding the photo &amp; signature size.</div>
+          </div>
+        )}
+
+        {state === 'error' && (
+          <div style={{ textAlign: 'center', padding: '10px 0' }}>
+            <div className="sf-display" style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>Couldn’t read that</div>
+            <div style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.55, marginBottom: 18 }}>{error}</div>
+            <button className="sf-btn sf-btn--primary" onClick={onClose} style={{ width: '100%', justifyContent: 'center' }}>Pick a preset instead</button>
+          </div>
+        )}
+
+        {state === 'review' && spec && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 4 }}>
+              <span className="sf-display" style={{ fontWeight: 700, fontSize: 17 }}>Here’s what we found</span>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.05em', textTransform: 'uppercase', color: 'var(--green-ink)', background: 'var(--tint)', padding: '3px 8px', borderRadius: 99 }}>{spec.confidence || 'low'} confidence</span>
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 16, lineHeight: 1.5 }}>
+              {spec.exam_name ? <><strong>{spec.exam_name}</strong> — c</> : 'C'}heck the numbers below and fix any the reader got wrong, then continue.
+            </div>
+
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--green-ink)', marginBottom: 8 }}>Photo</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 6 }}>
+              {numField('photo', 'w', 'Width (px)')}
+              {numField('photo', 'h', 'Height (px)')}
+              {numField('photo', 'min_kb', 'Min (KB)')}
+              {numField('photo', 'max_kb', 'Max (KB)')}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: spec.signature ? 16 : 20 }}>
+              Background: <strong>{BG_LABEL(specBg(spec))}</strong>
+            </div>
+
+            {spec.signature && (spec.signature.w || spec.signature.h || spec.signature.max_kb) && (
+              <>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--green-ink)', margin: '4px 0 8px' }}>Signature</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+                  {numField('signature', 'w', 'Width (px)')}
+                  {numField('signature', 'h', 'Height (px)')}
+                  {numField('signature', 'min_kb', 'Min (KB)')}
+                  {numField('signature', 'max_kb', 'Max (KB)')}
+                </div>
+              </>
+            )}
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="sf-btn" onClick={onClose} style={{ flex: '0 0 auto' }}>Cancel</button>
+              <button className="sf-btn sf-btn--primary" onClick={onApply} style={{ flex: 1, justifyContent: 'center' }}>
+                <Ico.upload width="16" height="16" /> Use this &amp; upload my photo
+              </button>
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--faint)', textAlign: 'center', margin: '12px 0 0' }}>
+              Always confirm against the official notification before you submit.
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+// Background colour the extracted spec maps to (mirrors extractSpec.normalizeBg).
+function specBg(spec) {
+  const w = (spec?.photo?.bg || '').toLowerCase()
+  if (w.includes('off')) return '#eef3fb'
+  if (w.includes('light') && w.includes('blue')) return '#cfe0fb'
+  if (w.includes('blue')) return '#2f6fdb'
+  return '#ffffff'
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen,    setScreen]    = useState('home')
@@ -1399,7 +1537,13 @@ export default function App() {
   const [processKey, setProcessKey] = useState(0)
   const [segStatus, setSegStatus] = useState('idle') // idle | loading | ready | error
 
+  // Notification-screenshot → auto-spec (feature is optional; needs /api proxy)
+  const [noticeState, setNoticeState] = useState('idle') // idle | reading | review | error
+  const [detected,    setDetected]    = useState(null)
+  const [noticeErr,   setNoticeErr]   = useState('')
+
   const fileRef  = useRef(null)
+  const noticeRef = useRef(null)
   const imgElRef = useRef(null)
   const canvasRef = useRef(null)
   const segMaskRef = useRef(null)
@@ -1539,6 +1683,46 @@ export default function App() {
     setPreset(prev => ({ ...prev, [key]: val }))
   }, [])
 
+  // ── Notice screenshot → auto-spec ──
+  const openNotice = useCallback(() => { setNoticeErr(''); noticeRef.current?.click() }, [])
+
+  const handleNotice = useCallback(async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file?.type?.startsWith('image/')) return
+    setNoticeState('reading'); setNoticeErr('')
+    try {
+      const spec = await extractSpecFromImage(file)
+      if (!spec?.photo && !spec?.signature) {
+        setNoticeState('error')
+        setNoticeErr('Couldn’t find a photo or signature spec in that screenshot. Try a clearer shot, or pick a preset below.')
+        return
+      }
+      setDetected(spec); setNoticeState('review')
+    } catch (err) {
+      setNoticeState('error'); setNoticeErr(err.message || 'Something went wrong reading that screenshot.')
+    }
+  }, [])
+
+  // Live-edit a detected number in the review card (OCR can misread — let users fix it).
+  const editDetected = useCallback((block, key, raw) => {
+    const val = raw === '' ? null : Math.max(1, Math.round(Number(raw) || 0))
+    setDetected(d => ({ ...d, [block]: { ...(d?.[block] || {}), [key]: val } }))
+  }, [])
+
+  const applyDetected = useCallback(() => {
+    if (!detected) return
+    const p = specToPreset(detected)
+    toolRef.current = 'exam'
+    setMode('photo')
+    setPreset(p)
+    setBgColor(p.bg)
+    setNoticeState('idle'); setDetected(null)
+    openFile() // now the user picks their actual photo → editor opens pre-configured
+  }, [detected, openFile])
+
+  const closeNotice = useCallback(() => { setNoticeState('idle'); setDetected(null); setNoticeErr('') }, [])
+
   const download = useCallback(() => {
     if (!outputUrl) return
     const kind = screen === 'studio' ? 'listing' : 'exam'
@@ -1570,6 +1754,16 @@ export default function App() {
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
+      <input ref={noticeRef} type="file" accept="image/*" onChange={handleNotice} style={{ display: 'none' }} />
+
+      <NoticeReview
+        state={noticeState}
+        spec={detected}
+        error={noticeErr}
+        onEdit={editDetected}
+        onApply={applyDetected}
+        onClose={closeNotice}
+      />
 
       <Nav
         dark={dark}
@@ -1589,6 +1783,8 @@ export default function App() {
           onSelectPreset={(p) => { toolRef.current = 'exam'; handleSelectPreset(p); openFile() }}
           onOpenPdf={() => setScreen('pdf')}
           onOpenStudio={openStudio}
+          onAutoFill={openNotice}
+          noticeBusy={noticeState === 'reading'}
           mode={mode}
           onSetMode={setMode}
         />

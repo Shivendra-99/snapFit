@@ -7,10 +7,13 @@
 //
 //   node scripts/gen-seo.mjs
 //
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs'
+import { writeFileSync, mkdirSync, rmSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { PRESETS, MARKETPLACE_PRESETS } from '../src/presets.js'
+import {
+  MARKETPLACE_PRESETS, EXAMS, KB_TARGETS, EXAM_KW,
+  examKey, sellKey, kbKey, sigKey,
+} from './seo-copy-lib.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT   = resolve(__dirname, '..')
@@ -18,20 +21,12 @@ const PUBLIC = resolve(ROOT, 'public')
 const ORIGIN = 'https://www.snapfit.in'
 const TODAY  = new Date().toISOString().slice(0, 10)
 
-const EXAMS = PRESETS.filter(p => p.id !== 'custom')
-// High-volume "compress photo to N KB" queries — Indian exam applicants search
-// these constantly. Kept to sizes that actually appear across the exam presets.
-const KB_TARGETS = [10, 15, 20, 30, 40, 50, 100, 150, 200]
+// Model-written copy (from gen-copy.mjs). Missing / empty ⇒ each page falls back
+// to its template strings below, so the build never depends on it existing.
+const COPY = JSON.parse(readFileSync(resolve(__dirname, 'seo-copy.json'), 'utf8'))
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const att = (s) => esc(s).replace(/"/g, '&quot;')
-
-const EXAM_KW = {
-  neet: 'NEET, JEE Main & CUET', ugcnet: 'UGC NET', mpsc: 'MPSC & UPPSC',
-  ssc: 'SSC, IBPS & CTET', gate: 'GATE', cat: 'CAT', upsc: 'UPSC CSE',
-  bpsc: 'BPSC', tnpsc: 'TNPSC', rrb: 'RRB & NTPC', nda: 'NDA, CDS & AFCAT',
-  pass: 'Passport', visa: 'US Visa',
-}
 
 // ─── Shared JSON-LD helpers ───────────────────────────────────────────────────
 const softwareApp = () => ({
@@ -162,10 +157,12 @@ const write = (rel, html) => {
 function examPage(p) {
   const kw = EXAM_KW[p.id] || p.name
   const url = `/exam/${p.id}/`
+  const c = COPY[examKey(p)]
   const title = `${kw} Photo Size ${p.w}×${p.h} px (${p.min}–${p.max} KB) — Free Resizer | SnapFit`
-  const description = `Resize & compress your ${kw} photo to the exact ${p.w}×${p.h} px, ${p.min}–${p.max} KB JPEG with a white background. Free, instant, 100% in your browser — no upload, no sign-up.`
+  const description = c?.description ?? `Resize & compress your ${kw} photo to the exact ${p.w}×${p.h} px, ${p.min}–${p.max} KB JPEG with a white background. Free, instant, 100% in your browser — no upload, no sign-up.`
   const h1 = `${kw} photo size: ${p.w}×${p.h} px, ${p.min}–${p.max} KB`
-  const faqs = [
+  const lede = c?.lede ?? `Get an upload-ready ${kw} photo that meets the exact dimensions and file-size limit — resized, background-cleaned to white and compressed, without leaving your browser.`
+  const faqs = c?.faqs ?? [
     { q: `What is the photo size required for ${kw}?`, a: `${kw} requires a ${p.w}×${p.h} pixel JPEG photo between ${p.min} KB and ${p.max} KB with a plain white background. SnapFit resizes and compresses your photo to exactly this spec in one click.` },
     { q: `How do I compress my ${kw} photo to under ${p.max} KB?`, a: `Open SnapFit, choose the ${p.name} preset and upload your photo. It automatically reduces the JPEG file size to fit within the ${p.min}–${p.max} KB range — fine-tune it with the quality slider if needed.` },
     { q: `Can I change my photo background to white for ${kw}?`, a: `Yes. SnapFit removes the original background with on-device AI and replaces it with pure white, all inside your browser and completely free.` },
@@ -181,7 +178,7 @@ function examPage(p) {
   ]
   const sig = p.sig ? `<p style="margin-top:22px;color:var(--muted)">Need the signature too? ${esc(kw)} signature spec is <strong>${p.sig.w}×${p.sig.h} px, ${p.sig.min}–${p.sig.max} KB</strong> — <a href="/signature/">use the signature resizer</a>.</p>` : ''
   const body = `
-    <p class="lede">Get an upload-ready ${esc(kw)} photo that meets the exact dimensions and file-size limit — resized, background-cleaned to white and compressed, without leaving your browser.</p>
+    <p class="lede">${esc(lede)}</p>
     <div class="spec">
       <div><div class="k">Dimensions</div><div class="v">${p.w}×${p.h} px</div></div>
       <div><div class="k">File size</div><div class="v">${p.min}–${p.max} KB</div></div>
@@ -207,10 +204,12 @@ function sellPage(m) {
   const ratio = m.w === m.h ? '1:1 square' : `${m.w}:${m.h} (${(m.w / m.h).toFixed(2)}:1)`
   const cap = m.max >= 1000 ? `${(m.max / 1000).toFixed(m.max % 1000 ? 1 : 0)} MB` : `${m.max} KB`
   const url = `/sell/${m.id}/`
+  const c = COPY[sellKey(m)]
   const title = `${m.name} Product Photo Size ${m.w}×${m.h} px — Free Listing Image Maker | SnapFit`
-  const description = `Make ${m.name} listing photos: ${m.w}×${m.h} px on a pure-white background, under ${cap}. Remove the background with AI and export the exact size — free, in your browser, no watermark.`
+  const description = c?.description ?? `Make ${m.name} listing photos: ${m.w}×${m.h} px on a pure-white background, under ${cap}. Remove the background with AI and export the exact size — free, in your browser, no watermark.`
   const h1 = `${m.name} product photo size: ${m.w}×${m.h} px on white`
-  const faqs = [
+  const lede = c?.lede ?? `Turn a phone snapshot into a ${m.name}-ready listing photo — background removed to pure white and sized to spec, free and private in your browser.`
+  const faqs = c?.faqs ?? [
     { q: `What image size does ${m.name} require?`, a: `${m.name} listing images should be ${m.w}×${m.h} pixels (${ratio}) on a pure white background, under ${cap}. SnapFit Studio removes the background and exports this exact size for free.` },
     { q: `How do I get a pure white background for ${m.name}?`, a: `Upload your product photo to SnapFit Studio — on-device AI cuts out the product and drops it onto a pure white (#FFFFFF) background that meets ${m.name}'s catalogue requirement. Nothing is uploaded to a server.` },
     { q: `Is SnapFit Studio free and watermark-free?`, a: `Yes. Single listing photos are free with no watermark and no sign-up. Everything runs in your browser, so your product images stay private.` },
@@ -225,7 +224,7 @@ function sellPage(m) {
     ]),
   ]
   const body = `
-    <p class="lede">Turn a phone snapshot into a ${esc(m.name)}-ready listing photo — background removed to pure white and sized to spec, free and private in your browser.</p>
+    <p class="lede">${esc(lede)}</p>
     <div class="spec">
       <div><div class="k">Dimensions</div><div class="v">${m.w}×${m.h} px</div></div>
       <div><div class="k">Ratio</div><div class="v">${esc(ratio)}</div></div>
@@ -248,14 +247,16 @@ function sellPage(m) {
 // ─── "Compress to N KB" pages ─────────────────────────────────────────────────
 function kbPage(kb) {
   const url = `/compress/${kb}kb/`
+  const c = COPY[kbKey(kb)]
   const title = `Compress Photo to ${kb} KB Online — Free Image Size Reducer | SnapFit`
-  const description = `Reduce your photo to under ${kb} KB online for free, keeping the quality readable. Ideal for exam forms and uploads with a ${kb} KB limit. 100% in your browser — nothing uploaded.`
+  const description = c?.description ?? `Reduce your photo to under ${kb} KB online for free, keeping the quality readable. Ideal for exam forms and uploads with a ${kb} KB limit. 100% in your browser — nothing uploaded.`
   const h1 = `Compress a photo to ${kb} KB online`
+  const lede = c?.lede ?? `Bring any JPG or PNG under ${kb} KB while keeping it clear enough to pass form checks — resize and compress in one place, entirely in your browser.`
   const uses = EXAMS.filter(p => kb >= p.min && kb <= p.max)
   const useList = uses.length
     ? `<p>A ${kb} KB limit is common for ${uses.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])}</a>`).join(', ')}. Pick the matching preset and SnapFit hits the size automatically.</p>`
     : `<p>Choose the <a href="/?exam=custom">Custom preset</a>, set the maximum size to ${kb} KB, and SnapFit compresses your photo to fit.</p>`
-  const faqs = [
+  const faqs = c?.faqs ?? [
     { q: `How do I compress a photo to ${kb} KB?`, a: `Upload your image to SnapFit and either pick an exam preset with a ${kb} KB limit or open the Custom preset and set the maximum to ${kb} KB. The quality slider lets you trade a little sharpness for a smaller file until it fits.` },
     { q: `Will compressing to ${kb} KB ruin the quality?`, a: `SnapFit reduces JPEG quality gradually and shows a live preview, so you can stop at the smallest size that still looks clean. For very small limits, a tighter crop helps keep the face sharp.` },
     { q: `Is it free and private?`, a: `Yes — completely free, no sign-up, and every image is processed in your browser. Your photo is never uploaded to any server.` },
@@ -269,7 +270,7 @@ function kbPage(kb) {
     ]),
   ]
   const body = `
-    <p class="lede">Bring any JPG or PNG under ${kb} KB while keeping it clear enough to pass form checks — resize and compress in one place, entirely in your browser.</p>
+    <p class="lede">${esc(lede)}</p>
     ${useList}
     <a class="cta" href="/?exam=custom">Compress my photo →</a>
     <h2>How to reduce a photo to ${kb} KB</h2>
@@ -287,13 +288,15 @@ function kbPage(kb) {
 // ─── Signature resizer page ───────────────────────────────────────────────────
 function signaturePage() {
   const url = `/signature/`
+  const c = COPY[sigKey()]
   const title = `Exam Signature Size & Resizer — Free Signature Compressor | SnapFit`
-  const description = `Resize your signature to the exact size Indian exam forms need — SSC, UPSC, NEET, IBPS, RRB and more. Free signature compressor, 100% in your browser, no upload.`
+  const description = c?.description ?? `Resize your signature to the exact size Indian exam forms need — SSC, UPSC, NEET, IBPS, RRB and more. Free signature compressor, 100% in your browser, no upload.`
   const h1 = `Exam signature resizer: the exact size for every form`
+  const lede = c?.lede ?? `Every Indian exam wants the signature at its own pixel and KB size. Find yours below and resize it in seconds — free and private in your browser.`
   const rows = EXAMS.filter(p => p.sig).map(p =>
     `<tr><td><a href="/?exam=${p.id}&sig=1">${esc(p.name.split(',')[0])}</a></td><td class="mono">${p.sig.w}×${p.sig.h} px</td><td class="mono">${p.sig.min}–${p.sig.max} KB</td></tr>`
   ).join('\n      ')
-  const faqs = [
+  const faqs = c?.faqs ?? [
     { q: `What is the signature size for exam forms?`, a: `Most Indian exam forms want a signature scanned at roughly 140–200 px wide by 60–100 px tall, saved as a JPEG between 4 KB and 50 KB on a white background. Exact numbers vary by exam — see the table above.` },
     { q: `How do I resize my signature for an exam form?`, a: `Sign on white paper, photograph it, open SnapFit, choose your exam and switch to Signature mode. SnapFit crops and compresses the signature to that exam's required size.` },
     { q: `Is the signature tool free and private?`, a: `Yes. It runs entirely in your browser at no cost, and your signature image is never uploaded anywhere.` },
@@ -307,7 +310,7 @@ function signaturePage() {
     ]),
   ]
   const body = `
-    <p class="lede">Every Indian exam wants the signature at its own pixel and KB size. Find yours below and resize it in seconds — free and private in your browser.</p>
+    <p class="lede">${esc(lede)}</p>
     <table class="data">
       <thead><tr><th>Exam</th><th>Signature size</th><th>File size</th></tr></thead>
       <tbody>
