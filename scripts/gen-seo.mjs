@@ -84,6 +84,7 @@ function pageHtml({ url, title, description, h1, crumbs, jsonld, body }) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3576532225137751" crossorigin="anonymous"></script>
   <title>${att(title)}</title>
   <meta name="description" content="${att(description)}" />
   <link rel="canonical" href="${canonical}" />
