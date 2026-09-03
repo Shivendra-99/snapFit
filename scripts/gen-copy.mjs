@@ -41,6 +41,13 @@ if (!KEY) {
 
 const cache = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, 'utf8')) : {}
 
+// Write the cache with sorted top-level keys (stable diffs). NOTE: pass `null` as
+// the replacer — an array replacer would whitelist keys and strip nested fields.
+const saveCache = () => {
+  const sorted = Object.fromEntries(Object.keys(cache).sort().map(k => [k, cache[k]]))
+  writeFileSync(CACHE, JSON.stringify(sorted, null, 2) + '\n')
+}
+
 // ── prompt builders per page type ──
 function promptFor({ type, facts }) {
   const rules =
@@ -69,8 +76,10 @@ function promptFor({ type, facts }) {
   return `${rules}\n${shape}\nTopic: resizing a scanned SIGNATURE to the size Indian exam forms require. Per-exam signature specs: ${list}. Signatures are signed on white paper, photographed, then cropped and compressed.`
 }
 
-// ── model call ──
-async function askModel(prompt) {
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+// ── model call (retries on 429 with backoff — free tier is rate-limited) ──
+async function askModel(prompt, attempt = 0) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -86,6 +95,13 @@ async function askModel(prompt) {
       response_format: { type: 'json_object' },
     }),
   })
+  if (res.status === 429) {
+    if (attempt >= 4) throw new Error('rate limited (429) after retries')
+    const wait = 15000 * (attempt + 1) // 15s, 30s, 45s, 60s
+    process.stdout.write(`429, waiting ${wait / 1000}s… `)
+    await sleep(wait)
+    return askModel(prompt, attempt + 1)
+  }
   if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 300)}`)
   const data = await res.json()
   const text = data?.choices?.[0]?.message?.content
@@ -129,9 +145,11 @@ for (const d of descriptors) {
     cache[d.key] = { lede: copy.lede, description: copy.description, faqs: copy.faqs.slice(0, 4) }
     wrote++
     console.log('ok')
+    saveCache() // save after every success so a mid-run rate-limit never loses work
   } catch (e) {
     console.log(`FAILED (${e.message}) — page will use template`); failed++
   }
+  await sleep(3000) // gentle pacing to stay under the free-tier per-minute cap
 }
 
 // prune orphaned keys (specs changed / pages removed) to keep the cache clean
@@ -139,5 +157,5 @@ const valid = new Set(allDescriptors().map(d => d.key))
 let pruned = 0
 for (const k of Object.keys(cache)) if (!valid.has(k)) { delete cache[k]; pruned++ }
 
-writeFileSync(CACHE, JSON.stringify(cache, Object.keys(cache).sort(), 2) + '\n')
+saveCache()
 console.log(`\n✓ seo-copy.json: +${wrote} new, ${skipped} cached, ${failed} fell back, ${pruned} pruned — ${Object.keys(cache).length} total`)

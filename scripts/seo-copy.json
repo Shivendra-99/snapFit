@@ -1,1 +1,552 @@
-{}
+{
+  "exam:bpsc:1aednrn": {
+    "lede": "The photo required for the BPSC exam application form is 215x265 px, 10 to 50 KB, JPEG, on a white background.",
+    "description": "BPSC application photo specs: 215x265 px, 10-50 KB JPEG, white background. Resize and crop it in your browser, free, no upload.",
+    "faqs": [
+      {
+        "q": "What are the exact photo dimensions for the BPSC application form?",
+        "a": "The BPSC application form requires a photograph that is exactly 215x265 px in JPEG format, with the file weighing between 10 and 50 KB, set against a plain white background."
+      },
+      {
+        "q": "Which file format should the BPSC application photo be saved in?",
+        "a": "The photograph must be saved as a JPEG, as most government recruitment portals, including the BPSC site, only accept this format for uploaded images."
+      },
+      {
+        "q": "Can I resize and crop the BPSC photo without uploading it anywhere?",
+        "a": "Yes. The image is processed entirely within your browser using a small client-side tool, so nothing is sent to a server, there is no charge, and you do not need to register or sign in."
+      },
+      {
+        "q": "Will the resized BPSC photo fit within the 50 KB upper limit?",
+        "a": "Usually, yes. Since the image is only 215x265 px in JPEG on a flat white background, it tends to come in well under 50 KB, though very busy photographs may sit at the higher end of the allowed range."
+      }
+    ]
+  },
+  "exam:cat:zpaqlv": {
+    "lede": "Find out the exact passport-style photo size, file size, and format required for the CAT application form, with simple tips to get it right.",
+    "description": "CAT exam photo specifications: 100x130 px, 10 to 50 KB JPEG with a white background. Learn the rules and how to prepare yours in browser.",
+    "faqs": [
+      {
+        "q": "What is the exact photo specification for the CAT application form?",
+        "a": "The photograph must be exactly 100 pixels wide by 130 pixels high, saved as a JPEG between 10 KB and 50 KB, with a plain white background. Anything outside these dimensions or sizes will be rejected at upload."
+      },
+      {
+        "q": "Can I use a casual photograph for the CAT application?",
+        "a": "No, it must look like a passport-style photograph: head and shoulders clearly visible, face centred, neutral expression, and no caps or sunglasses unless worn for religious reasons. The background has to be white, not off-white or patterned."
+      },
+      {
+        "q": "Is the CAT photo processed on my device or uploaded somewhere?",
+        "a": "The resizing and compression happen entirely within your browser. No image is sent to any server, so your photograph stays on your computer throughout the process."
+      },
+      {
+        "q": "How do I reduce my photo to between 10 KB and 50 KB without losing clarity?",
+        "a": "Start from a sharp, well-lit passport-style image and export as JPEG, gradually lowering quality until the file size falls within the 10 to 50 KB window. Avoid aggressive compression, as facial features must remain clear for the invigilator to identify you."
+      }
+    ]
+  },
+  "exam:gate:1pgfbp8": {
+    "lede": "A short guide to the photo specification for the GATE application form, covering size, file weight, format and background colour.",
+    "description": "Get the GATE application photo right: 240x320 px, 5-200 KB, JPEG, white background. Resize, compress and check online for free.",
+    "faqs": [
+      {
+        "q": "What are the exact size and file size requirements for the GATE application photo?",
+        "a": "The photograph must be 240 pixels wide by 320 pixels high, and the file must be between 5 KB and 200 KB. Anything outside this range is likely to be rejected by the upload portal, so it is worth checking your image in a free online previewer that mirrors the official checker."
+      },
+      {
+        "q": "Which file format should I save my photograph in before uploading it?",
+        "a": "Only JPEG files are accepted for the GATE application form. PNG, BMP, WEBP and PDF files will not pass validation, even if their dimensions and file size look correct."
+      },
+      {
+        "q": "Does the background colour of the photograph matter?",
+        "a": "Yes. The photograph must have a plain white background, with no shadows, patterns or objects behind you. A neutral wall, a white bedsheet or a properly configured white screen all work well provided the lighting is even."
+      },
+      {
+        "q": "Is the resizing and compression tool really free and private?",
+        "a": "The tool is entirely free to use and does not require an account, email or subscription. All processing happens inside your browser, so your photograph never leaves your device or gets uploaded to any server."
+      }
+    ]
+  },
+  "exam:mpsc:8h9952": {
+    "lede": "Get the exact photo specification for the MPSC and UPPSC application form, with a free in-browser resizer that meets every stated rule.",
+    "description": "Photo rules for the MPSC and UPPSC application form: 200x230 px, 10-50 KB, JPEG on a white background. Resize in-browser for free.",
+    "faqs": [
+      {
+        "q": "What is the exact photo size and file size required for the MPSC and UPPSC application form?",
+        "a": "The photo must be exactly 200x230 pixels and between 10 KB and 50 KB in file size, saved as a JPEG on a plain white background. Any deviation from these stated values may cause your application to be rejected at the upload stage, so it is worth verifying the final file before submission."
+      },
+      {
+        "q": "Which image format should I use for the MPSC and UPPSC photograph?",
+        "a": "Use JPEG only, as the form typically accepts photographs saved in that format. PNG, BMP, or WebP files, even if they look identical, may not upload correctly or may fail the validation step on the official portal."
+      },
+      {
+        "q": "Does the background colour really matter for the MPSC and UPPSC photo?",
+        "a": "Yes, a clean white background is required. Coloured, patterned, or uneven backdrops, including shadows or a wall behind you, are a common reason for rejection, since the photograph is later cropped and printed on the admit card."
+      },
+      {
+        "q": "Is the photo resizer free to use and does it upload my image anywhere?",
+        "a": "The resizer runs entirely inside your web browser, which means your photograph is never sent to a server and stays on your device. There is no charge, no watermark, and no sign-up, so you can adjust the file until it fits the 200x230 px and 10-50 KB limits without any privacy concerns."
+      }
+    ]
+  },
+  "exam:nda:g0da54": {
+    "lede": "Find out the exact UPSC photo specification for NDA, CDS and AFCAT applications and resize your image correctly in your browser.",
+    "description": "UPSC photo rules for NDA, CDS and AFCAT forms: 200x240 px, 10-50 KB, JPEG, white background. Resize free, no upload.",
+    "faqs": [
+      {
+        "q": "What is the photo size for the UPSC NDA, CDS and AFCAT application form?",
+        "a": "The photograph must be 200 pixels wide by 240 pixels high, saved in JPEG format and between 10 KB and 50 KB in file size, with a white background."
+      },
+      {
+        "q": "Can the photo be in colour or only black and white?",
+        "a": "Colour photographs are accepted provided the background is plain white, the image is in JPEG format and the file size stays within the 10 to 50 KB range."
+      },
+      {
+        "q": "Will my photo be uploaded to a server when I resize it?",
+        "a": "No. The resizing happens entirely in your browser, so your photograph is never sent to any server and there is no sign-up or fee involved."
+      },
+      {
+        "q": "What happens if my photograph does not meet the UPSC specifications?",
+        "a": "If the dimensions are not exactly 200 by 240 pixels, the file is not JPEG, the background is not white or the size falls outside 10 to 50 KB, the form is liable to be rejected or flagged during scrutiny."
+      }
+    ]
+  },
+  "exam:neet:2cyllf": {
+    "lede": "Resize a passport-style photo to the 200 by 230 pixel size, between 10 and 200 kilobytes, in JPEG format on a plain white background, for NEET, JEE Main and CUET application forms.",
+    "description": "Resize your NEET, JEE Main and CUET application photo to 200x230 px, 10-200 KB JPEG on a white background. Free, in-browser, no sign-up.",
+    "faqs": [
+      {
+        "q": "What are the exact dimensions and file size for the NEET, JEE Main and CUET application photo?",
+        "a": "The photo must be exactly 200 pixels wide by 230 pixels tall, saved as a JPEG, and the file must fall between 10 KB and 200 KB in size. Anything outside these limits is likely to be rejected at the upload stage."
+      },
+      {
+        "q": "Does the photo really need a white background?",
+        "a": "Yes. NTA specifies a white or very light background with the face clearly visible and no shadows on the face or behind the head. Coloured, patterned or cluttered backdrops will lead to the form being marked defective."
+      },
+      {
+        "q": "Will my image be uploaded to a server?",
+        "a": "No. The entire resizing and compression process happens locally in your browser using JavaScript. Your photograph never leaves your device, so there is nothing to upload, store or worry about."
+      },
+      {
+        "q": "Is there any cost or registration involved?",
+        "a": "None at all. The tool is free to use, does not ask for an email or phone number, requires no account creation, and runs without installing any software or browser extension."
+      }
+    ]
+  },
+  "exam:pass:1o1vf70": {
+    "lede": "Compress a photo for the Passport exam application to 413×531 px and 20–100 KB in JPEG, all in your browser with no upload.",
+    "description": "Resize and compress your Passport exam application photo to 413×531 px JPEG, 20–100 KB, white background, free, private, in-browser.",
+    "faqs": [
+      {
+        "q": "What size must the Passport exam application photo be?",
+        "a": "The photograph must be exactly 413×531 pixels, saved as a JPEG on a plain white background, and kept between 20 KB and 100 KB in file size."
+      },
+      {
+        "q": "Do I need to create an account to use this tool?",
+        "a": "No account, sign-up or login is required. Simply open the page and start resizing straight away, free of charge."
+      },
+      {
+        "q": "Is my photograph uploaded to a server?",
+        "a": "Your image never leaves your device. All resizing and compression happens locally in your browser, so nothing is transmitted over the internet."
+      },
+      {
+        "q": "Why is a plain white background necessary?",
+        "a": "Officials need a clean, even backdrop to verify your identity clearly. A plain white background keeps your face sharply defined and meets the form's specification."
+      }
+    ]
+  },
+  "exam:rrb:83gtns": {
+    "lede": "Find out the exact photo size required for the RRB and NTPC exam application form before you upload it online.",
+    "description": "Required photo size for RRB and NTPC exam form: 130x160 px, 15-40 KB JPEG, white background. Resize and compress free in browser.",
+    "faqs": [
+      {
+        "q": "What is the exact photo size for the RRB and NTPC application form?",
+        "a": "The photograph has to be 130 pixels wide by 160 pixels tall, saved as a JPEG, and kept between 15 KB and 40 KB in file size, against a plain white background."
+      },
+      {
+        "q": "Why does the RRB and NTPC form ask for such a small photo?",
+        "a": "Indian railway recruitment boards need a uniform thumbnail that fits their printed hall ticket and online portal. A fixed 130x160 px image at 15-40 KB keeps every candidate's picture identical in size, aspect ratio, and clarity."
+      },
+      {
+        "q": "Can I click the photo myself at home and still meet the rules?",
+        "a": "Yes, provided you use a plain white wall as the background, face the camera directly, and then resize the resulting picture to 130x160 px in JPEG format within the 15-40 KB range before uploading."
+      },
+      {
+        "q": "Will my picture be uploaded to any server when I use this tool?",
+        "a": "No. The resizing and compression happen entirely inside your browser on your own device, so the photograph is never sent to or stored on any remote server, and no sign-up is required."
+      }
+    ]
+  },
+  "exam:ssc:1cmt0yt": {
+    "lede": "All you need to know about the photo specified for SSC, IBPS and CTET application forms, including size, file weight and background colour.",
+    "description": "Photo rules for SSC, IBPS and CTET application forms: 200x230 px, 20-50 KB JPEG on a white background, resized online for free.",
+    "faqs": [
+      {
+        "q": "What is the exact photo specification for SSC, IBPS and CTET application forms?",
+        "a": "The prescribed photograph is 200 pixels wide by 230 pixels tall, saved in JPEG format, with a file size between 20 KB and 50 KB on a plain white background."
+      },
+      {
+        "q": "Can I adjust the file size of my photograph without uploading it anywhere?",
+        "a": "Yes, a browser-based resizer lets you crop, resize and compress the image locally on your device, so the picture is never sent to any server and there is no registration involved."
+      },
+      {
+        "q": "Why is the white background insisted upon in these forms?",
+        "a": "A plain white background keeps the face evenly lit and helps the scanning software isolate it cleanly, which is why SSC, IBPS and CTET explicitly mention it in their instructions."
+      },
+      {
+        "q": "Do I have to pay anything or sign up to prepare the photograph?",
+        "a": "No, the tool is free of cost, works straight from the browser without any account creation, and simply lets you download the final JPEG once it falls within the 20-50 KB range."
+      }
+    ]
+  },
+  "exam:tnpsc:14g6a1x": {
+    "lede": "A precise guide to the photo specifications for the TNPSC exam application form, covering size, format and background requirements.",
+    "description": "Know the exact photo size, format and background rules for TNPSC exam applications. Upload-free, browser-based resizer included.",
+    "faqs": [
+      {
+        "q": "What is the exact photo size required for the TNPSC application form?",
+        "a": "The photograph must be 150 pixels wide by 200 pixels tall, saved in JPEG format with a file size between 10 KB and 40 KB and set against a plain white background."
+      },
+      {
+        "q": "Why does the TNPSC portal insist on a white background in the photograph?",
+        "a": "A uniform white background helps the scanning and verification system isolate the candidate's face cleanly, reducing the chances of rejection at the document-checking stage."
+      },
+      {
+        "q": "Can I upload a colour photograph for the TNPSC form?",
+        "a": "Yes, colour photographs are accepted, provided they meet every other requirement such as the 150 by 200 pixel dimension, the JPEG format, the white background and the 10 to 40 KB size limit."
+      },
+      {
+        "q": "Is my TNPSC photograph uploaded to any server when I resize it here?",
+        "a": "No, the entire resizing process happens within your browser, so the original image never leaves your device and there is no need to create an account or pay any fee."
+      }
+    ]
+  },
+  "exam:ugcnet:1ls2z9k": {
+    "lede": "The UGC NET application form requires a photograph that meets precise size, weight and background rules, and this free in-browser tool resizes your image accordingly.",
+    "description": "Resize and prepare your photo for the UGC NET application form to the exact 200x230 px, 10-100 KB JPEG specification with a white background.",
+    "faqs": [
+      {
+        "q": "What are the exact photo specifications for the UGC NET application form?",
+        "a": "The photograph must be 200 by 230 pixels, between 10 KB and 100 KB in file size, saved as a JPEG, and set against a plain white background. Nothing is uploaded; the resizing happens entirely in your browser."
+      },
+      {
+        "q": "Will the white background be applied automatically?",
+        "a": "Your original image is not altered. The tool outputs a JPEG at 200 by 230 pixels within the 10 to 100 KB range; you should provide a photograph already shot against a white wall or sheet to satisfy the background requirement."
+      },
+      {
+        "q": "Is my photograph uploaded to a server during resizing?",
+        "a": "No. All processing takes place locally in your browser, so your image never leaves your device. There is no sign-up, no account, and no charge for using the tool."
+      },
+      {
+        "q": "What should I do if my resized image is below 10 KB or above 100 KB?",
+        "a": "Try a higher quality source photograph if the output falls under 10 KB. If it exceeds 100 KB, use a clearer but slightly lower resolution source or recompress the JPEG before passing it through the tool again, then recheck the file size until it sits within the permitted band."
+      }
+    ]
+  },
+  "exam:upsc:1x1wak9": {
+    "lede": "Get the exact photo size and format the UPSC Civil Services Application form asks for, in plain steps. Nothing is uploaded, everything happens on your device.",
+    "description": "UPSC CSE application photo: 350 by 350 pixels, JPEG, 20 to 300 KB, white background. Resize and crop free in your browser, no sign-up.",
+    "faqs": [
+      {
+        "q": "What is the exact photo specification for the UPSC CSE application form?",
+        "a": "The photo must be 350 pixels wide and 350 pixels tall, saved in JPEG format, between 20 KB and 300 KB in size, with a plain white background. Your face should occupy a clear central portion of the frame and the image should be in colour."
+      },
+      {
+        "q": "Will the photo be uploaded to any server when I prepare it here?",
+        "a": "No. All cropping, resizing and compression happens locally in your web browser. The image file never leaves your device, which keeps your personal photograph private."
+      },
+      {
+        "q": "Do I need to create an account or pay to use this tool?",
+        "a": "There is no account, no sign-up step and no fee. Open the page, drop in your picture, adjust it to the 350 by 350 frame and download the finished JPEG."
+      },
+      {
+        "q": "What should I do if my downloaded file is just outside the 20 to 300 KB range?",
+        "a": "Run the image through the tool again and nudge the quality slider or the cropping area until the resulting JPEG falls between 20 KB and 300 KB. Re-check the file properties before attaching it to your UPSC form."
+      }
+    ]
+  },
+  "exam:visa:9qdqkq": {
+    "lede": "Need the right photo for your US visa medical form? Here is what the format demands and how to get it right on the first try.",
+    "description": "Get the exact 600x600 px JPEG photo (100-240 KB, white background) required for the US visa medical exam form, processed free in-browser.",
+    "faqs": [
+      {
+        "q": "What is the exact photo specification for the US visa medical exam form?",
+        "a": "The application requires a square image of 600 by 600 pixels, saved in JPEG format, with a file size falling between 100 and 240 kilobytes, and shot against a plain white background."
+      },
+      {
+        "q": "Why does the embassy insist on a 600x600 JPEG with a white background?",
+        "a": "A fixed square dimension lets the form crop consistently across different printers and software versions, while JPEG keeps the file compact for uploading. A white background removes shadows and distractions so the reviewing officer sees a clear head and shoulders."
+      },
+      {
+        "q": "Will my picture be uploaded to a server when I resize it here?",
+        "a": "No. All cropping, resizing and compression happen inside your browser using JavaScript. The image never leaves your device, so your personal details stay private."
+      },
+      {
+        "q": "Do I have to register or pay to use this tool?",
+        "a": "Registration is not required and there is no charge. You open the page, drop in your photograph, adjust it if needed, and download the finished file straight away."
+      }
+    ]
+  },
+  "kb:10:7z7bpd": {
+    "lede": "Shrink a photograph to under 10 KB in your browser for exam forms such as NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC and NDA.",
+    "description": "Compress a photograph to under 10 KB free in your browser. Built for NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC and NDA form uploads.",
+    "faqs": [
+      {
+        "q": "How do I get my photograph under the 10 KB size limit set by NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC or NDA?",
+        "a": "Upload the picture here and move the quality slider down until the preview shows the file weighing less than 10 KB. The whole process runs in your browser, so the image never leaves your device. You then save the compressed result and upload it to the examination portal."
+      },
+      {
+        "q": "Does the tool upload my photograph to any server while compressing it?",
+        "a": "No. Compression happens entirely within your browser using JavaScript, so nothing is sent across the internet. Your original picture stays on your computer, and only you decide where the smaller version goes."
+      },
+      {
+        "q": "Why does the photograph sometimes look blurry after compression?",
+        "a": "JPEG is a lossy format, so reducing file size means discarding some picture detail. The live preview lets you balance clarity against size, and you should keep the quality slider as high as the 10 KB ceiling allows."
+      },
+      {
+        "q": "Is there any charge or sign-up needed to use this compressor?",
+        "a": "No. The tool is free, needs no account, and works the moment the page loads on any modern browser."
+      }
+    ]
+  },
+  "kb:150:1a3bp5c": {
+    "lede": "Shrink a photograph to under 150 KB for NEET, UPSC, GATE or visa uploads, with a live preview that re-encodes as you slide the quality control.",
+    "description": "Compress a photo to under 150 KB online. Live JPEG preview, browser-based, free, no sign-up. Suits NEET, UPSC, GATE and visa uploads.",
+    "faqs": [
+      {
+        "q": "How exactly does the compressor shrink a photo to below 150 KB?",
+        "a": "It re-encodes the image as JPEG and gradually lowers the quality setting until the file falls under 150 KB. A live preview updates with every adjustment, so you can see the trade-off before saving."
+      },
+      {
+        "q": "Is the photograph sent to any server while I compress it?",
+        "a": "No. The entire process happens inside your browser. Your photograph never leaves your device, which keeps personal documents such as passports and admit cards private."
+      },
+      {
+        "q": "Does the tool work for government exam and visa portals that demand under 150 KB?",
+        "a": "Yes. NEET, UPSC, GATE, visa applications and similar portals commonly set a 150 KB ceiling for photographs and signatures. The slider lets you fine-tune until the output sits just below that threshold."
+      },
+      {
+        "q": "Do I need to create an account or pay anything to use it?",
+        "a": "No account, no payment and no installation. Open the page, drop in your photograph, drag the quality slider and download the result."
+      }
+    ]
+  },
+  "kb:15:fqhffg": {
+    "lede": "Bring any photograph under the 15 KB ceiling demanded by Indian competitive exams such as NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC, RRB and NDA.",
+    "description": "Compress a photo to under 15 KB in your browser for NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC, RRB, NDA. Free, no upload, no sign-up.",
+    "faqs": [
+      {
+        "q": "How small must my photograph be for these government and entrance examinations?",
+        "a": "Most recruitment and entrance bodies, such as NEET, UGC NET, MPSC, GATE, CAT, BPSC, TNPSC, RRB and NDA, cap the uploaded image at 15 KB. Our compressor lets you watch the file size tick downwards as JPEG quality is dialled back, so you can land safely below that threshold without guesswork."
+      },
+      {
+        "q": "Does my picture ever leave the device while it is being compressed?",
+        "a": "No. The resizing and quality adjustments happen entirely inside your browser. Nothing is transmitted to a server, so a passport-style image or signature stays private, and there is no account, login or payment involved."
+      },
+      {
+        "q": "Which formats are accepted, and what comes out at the other end?",
+        "a": "You can drop in a JPG, PNG or WebP file. The tool saves the result as a JPEG because that format hits the smallest size for photographs of this kind while still keeping faces recognisable, which matters for hall tickets and admit cards."
+      },
+      {
+        "q": "Will reducing the quality make my face blur beyond recognition?",
+        "a": "The slider moves in fine steps, and the preview updates with each change, so you can stop the moment the file drops under 15 KB while the features, ears and background still look clean. If the picture starts to smear, simply start again with a tighter crop before compressing."
+      }
+    ]
+  },
+  "kb:200:1em7s18": {
+    "lede": "Shrink a passport or exam photo to under 200 KB in your browser, with a live preview that drops JPEG quality step by step until it fits.",
+    "description": "Compress a photo to under 200 KB online for free. Browser-only, no upload, no sign-up, with a live preview while JPEG quality is reduced.",
+    "faqs": [
+      {
+        "q": "How does the tool bring a photo below 200 KB?",
+        "a": "It re-encodes the image as JPEG and lowers the quality factor in small steps, re-saving after each step. A live preview updates as the slider moves, and processing stops the moment the file size drops under 200 KB."
+      },
+      {
+        "q": "Is it safe to use for NEET, GATE, UPSC or visa photos?",
+        "a": "Yes. Nothing leaves your device, so the image is not uploaded to any server. This also means there is no queue, no waiting, and no account needed. You get the final compressed photo straight from your own browser."
+      },
+      {
+        "q": "Will lowering JPEG quality make my photo look bad?",
+        "a": "For small head-and-shoulders photos the difference between quality 95 and quality 70 is usually hard to spot, especially at the reduced file size needed for portals. The tool lets you eyeball the result in the preview before you download, so you can trade clarity for size only as far as you are comfortable."
+      },
+      {
+        "q": "Does it work on a phone, and do I need an app?",
+        "a": "It works in any modern mobile browser, including on Android and iPhone, so there is nothing to install. You pick the file from your gallery, watch the size shrink in the preview, and save the compressed image back to your phone."
+      }
+    ]
+  },
+  "kb:30:blo2ys": {
+    "lede": "Reduce a photo to under 30 KB online for NEET, SSC, UPSC and similar exam portals, with a live preview as quality is trimmed.",
+    "description": "Compress a photo below 30 KB for Indian exam forms such as NEET, SSC and UPSC. Browser based, free, with live preview.",
+    "faqs": [
+      {
+        "q": "How does this tool compress a photo to under 30 KB while letting me see the result?",
+        "a": "You load the image, the page reads its file size, and a slider lowers JPEG quality step by step. With each step the live preview refreshes, so you can stop the moment the file falls below 30 KB and looks acceptable."
+      },
+      {
+        "q": "Which Indian exam forms accept a photo within the 30 KB limit?",
+        "a": "Many recruitment and entrance portals cap the photograph at 30 KB, including NEET, UGC NET, MPSC, SSC, GATE, CAT, UPSC, BPSC, TNPSC, RRB, NDA and most passport applications. Always cross check the exact size and pixel rules on the official notification before uploading."
+      },
+      {
+        "q": "Does the tool send my photograph to any server?",
+        "a": "No. The compression happens entirely inside your browser, so the image never leaves your device. There is also no sign up, no account, and no payment involved."
+      },
+      {
+        "q": "Will reducing the JPEG quality affect the clarity of my photograph?",
+        "a": "Lowering JPEG quality removes fine detail and can introduce mild blockiness, especially around hair, edges and fabric patterns. The live preview lets you judge this yourself, and for most exam portals the slightly softer image is still well within their acceptance norms."
+      }
+    ]
+  },
+  "kb:40:113h2h1": {
+    "lede": "Shrink a photo to under 40 KB for government and entrance exam forms, with a live preview that trims quality step by step.",
+    "description": "Compress a JPEG or image to under 40 KB for NEET, UPSC, SSC, GATE, CAT and other exam forms. Free, browser-only, no sign-up.",
+    "faqs": [
+      {
+        "q": "What is the 40 KB image size limit for exam application forms and which tests use it?",
+        "a": "Many Indian recruitment and entrance examinations ask candidates to upload a photograph that does not exceed 40 KB, typically in JPG or JPEG format. The requirement appears in forms for NEET, UGC NET, MPSC, SSC, GATE, CAT, UPSC, BPSC, TNPSC, RRB, NDA and several state public service commission tests. Compression to that ceiling is necessary because online portals reject files that cross the limit, and a photograph that is too heavy will simply fail to upload at the submission stage."
+      },
+      {
+        "q": "How does this compressor decide how much to compress a photo?",
+        "a": "The tool works by progressively lowering the JPEG quality factor and re-rendering the image until its file size falls below 40 KB. You see the picture update in real time as the quality slider moves, so you can judge when faces, edges and background detail still look acceptable. Because the reduction is gradual rather than sudden, you are less likely to end up with a blurry passport-style photograph just to meet the size cap."
+      },
+      {
+        "q": "Are my photographs uploaded to a server while I compress them?",
+        "a": "No. Every step of the compression, preview and download happens inside your own browser through client-side scripts, so the image never travels to a remote server. This matters for official forms because candidates are often uploading the same photo used on identity cards, certificates and admit cards. Keeping the file local means it cannot be intercepted, cached or stored by a third party during the resizing process."
+      },
+      {
+        "q": "Do I need to create an account or pay to compress below 40 KB?",
+        "a": "There is no registration, subscription or fee involved. You open the page, drop in the image, watch the live preview settle under 40 KB, and save the result. It runs on desktop as well as mobile browsers, which is helpful when the form has to be filled from a phone and the original picture was clicked on the same device."
+      }
+    ]
+  },
+  "sell:flipkart:1ctkpzd": {
+    "lede": "Flipkart listing photos need a 1000x1000 square frame on a pure white backdrop, with file size capped at 2000 KB.",
+    "description": "Flipkart product photo specs explained for Indian sellers: 1000x1000 px, pure white background, max file 2000 KB, processed free in your browser.",
+    "faqs": [
+      {
+        "q": "What are the exact pixel and file size requirements for Flipkart listing images?",
+        "a": "Flipkart accepts product images at 1000x1000 px with a pure white background. The uploaded file must not exceed 2000 KB. Anything outside these limits is likely to be rejected or downgraded in search placement."
+      },
+      {
+        "q": "Why is a 1:1 aspect ratio important for Flipkart catalogue photos?",
+        "a": "Flipkart's catalogue grid, search thumbnails and mobile cards are all built around a square frame. A 1:1 ratio at 1000x1000 px keeps your product centred without cropping, stretching or those awkward grey bars down either side."
+      },
+      {
+        "q": "Can a slightly off-white or light-grey background still pass Flipkart's checks?",
+        "a": "The marketplace asks for a pure white background, but in practice a very pale, near-white shade can work if it reads as white on a standard laptop screen. Anything visibly grey is best avoided, as it changes the look of the listing and may trigger a rejection."
+      },
+      {
+        "q": "How do I resize and compress my photos to fit the Flipkart limits without uploading them anywhere?",
+        "a": "Open this tool in your browser, drop in your product shot, set the crop to 1:1, pick the pure white background, and export at 1000x1000 px. The image is processed entirely on your device, nothing is sent to a server, there is no charge, and no account or sign-up is needed."
+      }
+    ]
+  },
+  "sell:meesho:1b3athx": {
+    "lede": "A free in-browser resizer that prepares Meesho product photos at the 1000 by 1000 pixel square with a pure white background.",
+    "description": "Resize and prep Meesho listing photos in your browser. 1000x1000 px, pure white, under 5 MB. Free, private, no sign-up.",
+    "faqs": [
+      {
+        "q": "What size does Meesho need for product listing photos?",
+        "a": "Meesho requires product photos in a 1:1 square at 1000 by 1000 pixels with a pure white background. This in-browser tool resizes your image to those exact dimensions and fills the backdrop with white in a single step, so nothing is uploaded to a server."
+      },
+      {
+        "q": "Is the file processed online or on my device?",
+        "a": "Everything happens inside your browser tab using client-side code. Your original image never leaves your computer, which matters when you are handling supplier samples or unreleased designs that you would rather keep private."
+      },
+      {
+        "q": "Does the tool keep image quality under the 5 MB limit?",
+        "a": "Yes. The tool exports at 1000 by 1000 pixels and compresses the result so the saved file stays below the 5000 KB cap set by Meesho. You can preview the file size before downloading and re-run the export if you want a different quality setting."
+      },
+      {
+        "q": "Do I need to create an account or pay anything?",
+        "a": "No account, no subscription, no watermark. Open the page, drop in your photo, and save the finished image. It works on a laptop, a tablet, or a phone browser, which is handy for sellers who shoot and list from the same device."
+      }
+    ]
+  },
+  "sell:myntra:1hejy33": {
+    "lede": "Myntra product photos must be 1080 by 1440 pixels on a pure white background and no larger than 5000 KB.",
+    "description": "Get Myntra-ready product photos: 1080x1440 px, 3:4 portrait, pure white background, under 5000 KB. Free browser tool, no upload.",
+    "faqs": [
+      {
+        "q": "What size must my Myntra product photo be?",
+        "a": "Listings on Myntra require product images that are exactly 1080 by 1440 pixels, shot in a 3:4 portrait format on a pure white background. Files must not exceed 5000 KB."
+      },
+      {
+        "q": "Why does Myntra insist on a pure white background?",
+        "a": "A pure white backdrop keeps the focus on your garment or accessory and matches the clean, uniform look across the marketplace. Coloured, patterned or shadowed backgrounds get rejected at upload."
+      },
+      {
+        "q": "Will my photos get uploaded anywhere while I edit them?",
+        "a": "No. All resizing, background cleaning and compression happen inside your browser on your own device. Nothing is sent to a server, so your catalogue images stay private."
+      },
+      {
+        "q": "Do I need to create an account or pay to use this tool?",
+        "a": "There is no sign-up and no fee. Open the page, drop in your image, and download the Myntra-compliant version without sharing any personal details."
+      }
+    ]
+  },
+  "sell:ondc:1262mxl": {
+    "lede": "Get your product photos ONDC-ready: a clean 1000x1000 square on a pure white background, kept under 2000 KB, all processed in your browser.",
+    "description": "Resize product images to 1000x1000 px on a pure white background for the ONDC marketplace. Free, in-browser, no upload or sign-up required.",
+    "faqs": [
+      {
+        "q": "What size and background does ONDC need for listing photos?",
+        "a": "ONDC asks for a square image at 1000x1000 px on a pure white background, so the product sits inside a 1:1 frame with no props, shadows, or coloured backdrop."
+      },
+      {
+        "q": "Will my photo be sent to a server while I resize it?",
+        "a": "No. The tool runs entirely in your browser, so the original image and the resized version stay on your device. Nothing is uploaded and no account is needed."
+      },
+      {
+        "q": "Why is the 2000 KB file limit important for ONDC listings?",
+        "a": "ONDC caps listing images at 2000 KB to keep catalogue pages loading quickly on mobile networks across India. Anything heavier risks rejection or slow browsing for buyers."
+      },
+      {
+        "q": "Can I use a cream or off-white backdrop instead of pure white?",
+        "a": "Stick with a true white background for ONDC, as cream, grey or textured surfaces often fail review. A neutral, plain backdrop is acceptable only when white is not workable."
+      }
+    ]
+  },
+  "sell:social:1a7fllr": {
+    "lede": "Square 1080 by 1080 product photos with a clean white background, sized under 8000 KB for Indian sellers on Instagram and WhatsApp.",
+    "description": "Make listing photos for Instagram and WhatsApp shops: 1080x1080 square, pure white background, up to 8000 KB. Free, in-browser, no sign-up.",
+    "faqs": [
+      {
+        "q": "What size should product photos be for Instagram and WhatsApp listings?",
+        "a": "Use 1080x1080 px. This 1:1 square is the standard for Instagram feed posts, catalogue grids and WhatsApp Business product cards, so the same image works across both platforms without awkward cropping."
+      },
+      {
+        "q": "Why does the background need to be pure white?",
+        "a": "Marketplace tools on Instagram and WhatsApp expect a pure white backdrop so the product stands out clearly. White also keeps the focus on the item, helps the auto-crop detect edges correctly, and gives your shop grid a tidy, uniform look that shoppers in India tend to trust."
+      },
+      {
+        "q": "What is the maximum file size I can upload?",
+        "a": "Keep the image at or below 8000 KB. Going over this limit will stop the upload on both apps, so compress the JPG after editing rather than reducing the pixel dimensions, since the 1080x1080 size is fixed."
+      },
+      {
+        "q": "How is my photo processed and is it safe to use?",
+        "a": "Everything happens inside your web browser. The picture is never sent to a server, there is no account to create, and no fee to pay. You simply upload the file from your phone or laptop, edit it, and download the finished version back to your own device."
+      }
+    ]
+  },
+  "sig:all:skd59k": {
+    "lede": "Resize a scanned signature to the exact pixel size and file weight that Indian exam portals demand, without uploading anything.",
+    "description": "Resize a scanned signature to NEET, SSC, UPSC, CAT and other Indian exam specs. Free, browser-only, no sign-up.",
+    "faqs": [
+      {
+        "q": "What pixel size and file weight should a scanned signature have for Indian government exams?",
+        "a": "Most Indian exam portals ask for a signature between 10 KB and 50 KB, but the pixel box varies. NEET, UGC NET, GATE, UPSC, BPSC, NDA, passport and visa forms want 200×100 px. SSC and TNPSC want 200×80 px. CAT asks for 150×75 px and RRB for 140×60 px. File-weight limits differ too: SSC is tightest at 10-20 KB, GATE is the most generous at 4-200 KB, and RRB and TNPSC cap at 40 KB. Sign on plain white paper, photograph it flat, then crop and compress in this tool to the dimensions listed above."
+      },
+      {
+        "q": "Do I need to upload my signature anywhere?",
+        "a": "No. The resize, crop and compress steps run entirely inside your browser. The image is never sent to a server, so it stays on your own device throughout."
+      },
+      {
+        "q": "Is the tool free and does it need an account?",
+        "a": "Yes on both counts. There is no charge, no login, no email verification and no watermark added to the final image."
+      },
+      {
+        "q": "Why does my uploaded signature look blurry after resizing?",
+        "a": "Starting from a well-lit photograph taken straight above the signed paper keeps the source sharp. Crop close to the ink before resizing, because enlarging a small crop to fit 200×100 px or 140×60 px is what softens the strokes. Compressing once to the required file weight, rather than several times, also preserves edges."
+      }
+    ]
+  }
+}
