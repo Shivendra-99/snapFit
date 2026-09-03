@@ -923,6 +923,14 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
               q: 'What photo format do Indian competitive exams require?',
               a: 'Nearly all Indian exams — NEET, JEE, UPSC, SSC, IBPS, RRB, GATE, NDA, AFCAT, CTET — require JPEG (JPG) format. SnapFit always produces a JPEG output and auto-compresses it to the KB target of the chosen exam.',
             },
+            {
+              q: 'How do I use a photo resizer?',
+              a: 'Upload your photo, choose a target — an exact pixel size, or a KB/MB file-size limit — and download the result. In SnapFit you pick a preset (or Custom), and it crops, resizes and compresses in one step, entirely in your browser.',
+            },
+            {
+              q: 'Which is the best photo resizer app?',
+              a: 'The best photo resizer is one that hits your exact requirement without uploading your photo. SnapFit runs fully in the browser — no app to install, no sign-up, no watermark — and targets precise pixel and KB/MB sizes for exam forms, PAN and passport photos, and marketplace listings.',
+            },
           ].map(({ q, a }, i) => (
             <FaqItem key={q} q={q} a={a} idx={i} />
           ))}
@@ -954,11 +962,23 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
             </div>
           </div>
           <div id="compress" data-reveal>
-            <div className="sf-dir-h">Compress to exact KB</div>
+            <div className="sf-dir-h">Photo resizer to exact KB / MB</div>
             <div className="sf-dir-links">
               {[10, 15, 20, 30, 40, 50, 100, 150, 200].map(kb => (
-                <a key={kb} href={`/compress/${kb}kb/`}>Compress photo to {kb} KB</a>
+                <a key={kb} href={`/compress/${kb}kb/`}>Photo resizer to {kb} KB</a>
               ))}
+              {[1, 2].map(mb => (
+                <a key={`${mb}mb`} href={`/compress/${mb}mb/`}>Photo resizer to {mb} MB</a>
+              ))}
+            </div>
+          </div>
+          <div id="resizer" data-reveal>
+            <div className="sf-dir-h">Photo resizer</div>
+            <div className="sf-dir-links">
+              <a href="/photo-resizer/">Free online photo resizer</a>
+              <a href="/photo-resizer-in-pixels/">Photo resizer in pixels &amp; cm</a>
+              <a href="/pan-card-photo-resizer/">PAN card photo resizer</a>
+              <a href="/signature/">Exam signature resizer</a>
             </div>
           </div>
         </div>

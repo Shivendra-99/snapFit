@@ -25,6 +25,9 @@ const TODAY  = new Date().toISOString().slice(0, 10)
 // to its template strings below, so the build never depends on it existing.
 const COPY = JSON.parse(readFileSync(resolve(__dirname, 'seo-copy.json'), 'utf8'))
 
+// "Photo resizer to N MB" targets (KB_TARGETS comes from the shared lib).
+const MB_TARGETS = [1, 2]
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const att = (s) => esc(s).replace(/"/g, '&quot;')
 
@@ -52,14 +55,20 @@ const howToLD = (name, steps) => ({
 const CLOUD = `
     <h2>Every SnapFit tool</h2>
     <div class="cloud">
+      <a href="/photo-resizer/">Photo resizer</a>
+      <a href="/photo-resizer-in-pixels/">Resize in pixels &amp; cm</a>
+      <a href="/pan-card-photo-resizer/">PAN card photo</a>
+      <a href="/signature/">Signature resizer</a>
+    </div>
+    <div class="cloud" style="margin-top:10px">
       ${EXAMS.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])} photo</a>`).join('\n      ')}
-      <a href="/signature/">Exam signature size</a>
     </div>
     <div class="cloud" style="margin-top:10px">
       ${MARKETPLACE_PRESETS.map(m => `<a href="/sell/${m.id}/">${esc(m.name)} photo</a>`).join('\n      ')}
     </div>
     <div class="cloud" style="margin-top:10px">
-      ${KB_TARGETS.map(kb => `<a href="/compress/${kb}kb/">Compress to ${kb} KB</a>`).join('\n      ')}
+      ${KB_TARGETS.map(kb => `<a href="/compress/${kb}kb/">Resize to ${kb} KB</a>`).join('\n      ')}
+      ${MB_TARGETS.map(mb => `<a href="/compress/${mb}mb/">Resize to ${mb} MB</a>`).join('\n      ')}
     </div>`
 
 // ─── Page shell ───────────────────────────────────────────────────────────────
@@ -248,10 +257,10 @@ function sellPage(m) {
 function kbPage(kb) {
   const url = `/compress/${kb}kb/`
   const c = COPY[kbKey(kb)]
-  const title = `Compress Photo to ${kb} KB Online — Free Image Size Reducer | SnapFit`
-  const description = c?.description ?? `Reduce your photo to under ${kb} KB online for free, keeping the quality readable. Ideal for exam forms and uploads with a ${kb} KB limit. 100% in your browser — nothing uploaded.`
-  const h1 = `Compress a photo to ${kb} KB online`
-  const lede = c?.lede ?? `Bring any JPG or PNG under ${kb} KB while keeping it clear enough to pass form checks — resize and compress in one place, entirely in your browser.`
+  const title = `Photo Resizer to ${kb} KB — Free Online Image Size Reducer | SnapFit`
+  const description = c?.description ?? `Free online photo resizer to ${kb} KB: reduce any JPG or PNG to under ${kb} KB while keeping it readable. Ideal for exam forms with a ${kb} KB limit. 100% in your browser — nothing uploaded.`
+  const h1 = `Photo resizer to ${kb} KB online`
+  const lede = c?.lede ?? `Resize and compress any JPG or PNG to under ${kb} KB while keeping it clear enough to pass form checks — a free online photo resizer that runs entirely in your browser.`
   const uses = EXAMS.filter(p => kb >= p.min && kb <= p.max)
   const useList = uses.length
     ? `<p>A ${kb} KB limit is common for ${uses.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])}</a>`).join(', ')}. Pick the matching preset and SnapFit hits the size automatically.</p>`
@@ -272,8 +281,8 @@ function kbPage(kb) {
   const body = `
     <p class="lede">${esc(lede)}</p>
     ${useList}
-    <a class="cta" href="/?exam=custom">Compress my photo →</a>
-    <h2>How to reduce a photo to ${kb} KB</h2>
+    <a class="cta" href="/?exam=custom">Resize my photo to ${kb} KB →</a>
+    <h2>How to resize a photo to ${kb} KB</h2>
     <ol class="steps">
       <li>Upload your photo — it stays on your device.</li>
       <li>Pick a preset with a ${kb} KB limit, or set Custom to ${kb} KB.</li>
@@ -330,6 +339,172 @@ function signaturePage() {
   return url
 }
 
+// ─── "Photo resizer to N MB" pages ─────────────────────────────────────────────
+function mbPage(mb) {
+  const url = `/compress/${mb}mb/`
+  const kb = mb * 1024
+  const title = `Photo Resizer to ${mb} MB — Reduce Photo Size in MB Online Free | SnapFit`
+  const description = `Free online photo resizer to ${mb} MB: reduce a large JPG or PNG to under ${mb} MB (${kb} KB) in your browser. No upload, no sign-up, no watermark.`
+  const h1 = `Photo resizer to ${mb} MB online`
+  const lede = `Got a photo that's too large? Bring it under ${mb} MB in seconds with a free photo resizer that works entirely in your browser — nothing is uploaded.`
+  const faqs = [
+    { q: `How do I resize a photo to ${mb} MB?`, a: `Open SnapFit, choose the Custom preset and upload your photo. Set the maximum size to ${kb} KB (${mb} MB) and drag the quality slider until the file fits. The preview updates live so you can stop at the best quality.` },
+    { q: `What is ${mb} MB in KB?`, a: `${mb} MB is ${kb} KB (1 MB = 1024 KB). Many upload forms show the limit in MB but check the file in KB, so SnapFit lets you target either.` },
+    { q: `Is the photo resizer free and private?`, a: `Yes — it is completely free, needs no account, and processes every image in your browser. Your photo never leaves your device.` },
+  ]
+  const jsonld = [faqLD(faqs), howToLD(`How to resize a photo to ${mb} MB`, [
+    { n: 'Upload', t: 'Open SnapFit and upload your photo.' },
+    { n: 'Set the target', t: `Use the Custom preset and set the maximum size to ${kb} KB (${mb} MB).` },
+    { n: 'Download', t: `Adjust the quality slider until the size is under ${mb} MB, then download.` },
+  ])]
+  const body = `
+    <p class="lede">${esc(lede)}</p>
+    <p>Choose the <a href="/?exam=custom">Custom preset</a>, set the maximum to ${kb} KB, and SnapFit shrinks your photo to fit under ${mb} MB.</p>
+    <a class="cta" href="/?exam=custom">Resize my photo to ${mb} MB →</a>
+    <h2>How to resize a photo to ${mb} MB</h2>
+    <ol class="steps">
+      <li>Upload your photo — it stays on your device.</li>
+      <li>Open Custom and set the maximum to ${kb} KB (${mb} MB).</li>
+      <li>Nudge the quality slider until it fits, then download.</li>
+    </ol>
+    <h2>Frequently asked questions</h2>
+    ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
+  write(`compress/${mb}mb/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Photo resizer', url: '/photo-resizer/' }, { name: `${mb} MB`, url }], jsonld, body }))
+  return url
+}
+
+// ─── Photo-resizer pillar page (head term hub) ─────────────────────────────────
+function photoResizerPillarPage() {
+  const url = `/photo-resizer/`
+  const title = `Free Online Photo Resizer — Resize Photo in KB, MB, Pixels & CM | SnapFit`
+  const description = `Free online photo resizer: resize and compress any JPG or PNG to an exact KB, MB, pixel or cm size. No upload, no watermark, no sign-up — 100% in your browser.`
+  const h1 = `Free online photo resizer`
+  const lede = `Resize any photo to the exact size you need — in KB, MB, pixels or centimetres — for exam forms, ID documents and marketplace listings. Free, private and instant, entirely in your browser.`
+  const kbLinks = KB_TARGETS.map(kb => `<a href="/compress/${kb}kb/">Resize to ${kb} KB</a>`).join('\n      ')
+  const mbLinks = MB_TARGETS.map(mb => `<a href="/compress/${mb}mb/">Resize to ${mb} MB</a>`).join('\n      ')
+  const examLinks = EXAMS.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])} photo</a>`).join('\n      ')
+  const faqs = [
+    { q: `How do I use a photo resizer?`, a: `Upload your photo, choose a target — an exact pixel size, or a KB/MB file-size limit — and download the result. In SnapFit you pick a preset (or Custom), and it crops, resizes and compresses in one step, all inside your browser.` },
+    { q: `Which is the best photo resizer app?`, a: `The best photo resizer is the one that hits your exact requirement without uploading your photo. SnapFit runs entirely in the browser — no app to install, no sign-up, no watermark — and targets precise pixel and KB/MB sizes for Indian exam forms, ID photos and marketplace listings.` },
+    { q: `Can I resize a photo to a specific KB or MB size?`, a: `Yes. Set a maximum file size and SnapFit compresses the JPEG until it fits — from small exam limits like 20 KB up to a few MB — while a live preview shows the quality.` },
+    { q: `Is the photo resizer free?`, a: `Completely free, with no account and no watermark. Every image is processed on your device, so your photos stay private.` },
+    { q: `What image formats can I resize?`, a: `You can resize JPG (JPEG) and PNG images, and export a compressed JPEG that is ready to upload.` },
+  ]
+  const jsonld = [faqLD(faqs), howToLD('How to resize a photo online', [
+    { n: 'Upload', t: 'Open SnapFit and upload any JPG or PNG. It stays on your device.' },
+    { n: 'Choose a size', t: 'Pick a preset, or Custom to set exact pixels and a KB/MB limit.' },
+    { n: 'Download', t: 'Download the resized, compressed photo, ready to upload.' },
+  ])]
+  const body = `
+    <p class="lede">${esc(lede)}</p>
+    <a class="cta" href="/?exam=custom">Open the photo resizer →</a>
+    <h2>Resize a photo to a file size</h2>
+    <div class="cloud">
+      ${kbLinks}
+      ${mbLinks}
+    </div>
+    <h2>Resize by pixels, cm or document</h2>
+    <div class="cloud">
+      <a href="/photo-resizer-in-pixels/">Resize in pixels &amp; cm</a>
+      <a href="/pan-card-photo-resizer/">PAN card photo</a>
+      <a href="/signature/">Signature resizer</a>
+    </div>
+    <h2>Exam photo sizes</h2>
+    <div class="cloud">
+      ${examLinks}
+    </div>
+    <h2>How to resize a photo online</h2>
+    <ol class="steps">
+      <li>Upload any JPG or PNG — it never leaves your device.</li>
+      <li>Pick a preset, or Custom to set exact pixels and a KB/MB limit.</li>
+      <li>Download the resized, compressed photo.</li>
+    </ol>
+    <h2>Frequently asked questions</h2>
+    ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
+  write(`photo-resizer/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Photo resizer', url }], jsonld, body }))
+  return url
+}
+
+// ─── PAN card photo resizer ────────────────────────────────────────────────────
+function panCardPage() {
+  const url = `/pan-card-photo-resizer/`
+  const title = `PAN Card Photo Resizer — Resize PAN Photo Size Online Free | SnapFit`
+  const description = `Free PAN card photo resizer: resize your photo for a PAN card / Form 49A application to a passport-style size on a light background, compressed to a small KB. In your browser, no upload.`
+  const h1 = `PAN card photo resizer`
+  const lede = `Resize your photograph for a PAN card (Form 49A) application — a passport-style colour photo on a light background, compressed to the small file size online forms accept — free and private in your browser.`
+  const faqs = [
+    { q: `What photo size is needed for a PAN card?`, a: `PAN card applications generally ask for a recent passport-style colour photograph, about 3.5 × 2.5 cm, on a plain light or white background with the full face visible. Online forms usually want a small JPEG, often around 20–50 KB. Always confirm the exact figure on the NSDL / UTIITSL portal you are using.` },
+    { q: `How do I resize my photo for a PAN card online?`, a: `Open SnapFit, choose the Custom preset, and upload your photo. Set the size you need and the maximum KB the form allows, then download the ready JPEG. Everything runs in your browser.` },
+    { q: `Is the PAN card photo resizer free and private?`, a: `Yes — free, no sign-up, and your photo is processed on your device and never uploaded to any server.` },
+  ]
+  const jsonld = [faqLD(faqs), howToLD('How to resize a PAN card photo', [
+    { n: 'Upload', t: 'Open SnapFit and upload a recent passport-style photo.' },
+    { n: 'Set the size', t: 'Use the Custom preset to set the dimensions and KB limit your PAN form requires.' },
+    { n: 'Download', t: 'Download the resized, compressed JPEG and upload it to the PAN portal.' },
+  ])]
+  const body = `
+    <p class="lede">${esc(lede)}</p>
+    <div class="spec">
+      <div><div class="k">Photo</div><div class="v">Passport-style</div></div>
+      <div><div class="k">Size</div><div class="v">≈3.5×2.5 cm</div></div>
+      <div><div class="k">File</div><div class="v">~20–50 KB</div></div>
+      <div><div class="k">Background</div><div class="v">Light / white</div></div>
+    </div>
+    <a class="cta" href="/?exam=custom">Resize my PAN photo →</a>
+    <h2>How to resize a PAN card photo</h2>
+    <ol class="steps">
+      <li>Upload a recent passport-style photo — it stays on your device.</li>
+      <li>Open Custom and set the size and KB limit your PAN form asks for.</li>
+      <li>Download the ready JPEG and upload it to the PAN portal.</li>
+    </ol>
+    <h2>Frequently asked questions</h2>
+    ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
+  write(`pan-card-photo-resizer/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Photo resizer', url: '/photo-resizer/' }, { name: 'PAN card', url }], jsonld, body }))
+  return url
+}
+
+// ─── Photo resizer in pixels & cm ──────────────────────────────────────────────
+function pixelCmPage() {
+  const url = `/photo-resizer-in-pixels/`
+  const title = `Photo Resizer in Pixels & CM — Resize Image to Exact Size Online | SnapFit`
+  const description = `Free photo resizer in pixels and cm: set an exact width and height and resize your image online without losing clarity. No upload, no sign-up — runs in your browser.`
+  const h1 = `Photo resizer in pixels and cm`
+  const lede = `Set an exact width and height and resize your photo to precise pixels — or a centimetre size for print and forms — free and entirely in your browser.`
+  const faqs = [
+    { q: `How do I resize a photo to exact pixels?`, a: `Open SnapFit's Custom preset, enter the width and height in pixels, and upload your photo. It is resized to exactly those dimensions, and you can also cap the file size in KB.` },
+    { q: `How do I resize a photo in cm?`, a: `Decide the print size in centimetres and convert to pixels — at 300 DPI, 1 cm is about 118 px. Enter those pixel values in the Custom preset. A common ID size of 3.5 × 4.5 cm maps to roughly 413 × 531 px.` },
+    { q: `Will resizing to exact pixels stretch my photo?`, a: `SnapFit fits your photo to the frame and centres it, so faces are not stretched. You can nudge the zoom and vertical position to frame it correctly.` },
+    { q: `Is it free and private?`, a: `Yes — free, no account, and every image is processed on your device.` },
+  ]
+  const jsonld = [faqLD(faqs), howToLD('How to resize a photo to exact pixels', [
+    { n: 'Open Custom', t: 'Open SnapFit and choose the Custom preset.' },
+    { n: 'Enter size', t: 'Type the exact width and height in pixels (or the cm equivalent).' },
+    { n: 'Download', t: 'Upload your photo, frame it, and download the resized image.' },
+  ])]
+  const body = `
+    <p class="lede">${esc(lede)}</p>
+    <p>Use the <a href="/?exam=custom">Custom preset</a> to enter any width and height. For centimetre sizes, convert at roughly 118 px per cm (300 DPI).</p>
+    <a class="cta" href="/?exam=custom">Open the photo resizer →</a>
+    <table class="data">
+      <thead><tr><th>Common size</th><th>Pixels (300 DPI)</th></tr></thead>
+      <tbody>
+      <tr><td>2 × 2 inch</td><td class="mono">600 × 600 px</td></tr>
+      <tr><td>3.5 × 4.5 cm</td><td class="mono">413 × 531 px</td></tr>
+      <tr><td>3.5 × 2.5 cm</td><td class="mono">413 × 295 px</td></tr>
+      </tbody>
+    </table>
+    <h2>How to resize a photo to exact pixels</h2>
+    <ol class="steps">
+      <li>Open the Custom preset.</li>
+      <li>Enter the exact width and height in pixels (or cm equivalent).</li>
+      <li>Upload, frame and download the resized photo.</li>
+    </ol>
+    <h2>Frequently asked questions</h2>
+    ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
+  write(`photo-resizer-in-pixels/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Photo resizer', url: '/photo-resizer/' }, { name: 'Pixels & cm', url }], jsonld, body }))
+  return url
+}
+
 // ─── OG share image (SVG) ─────────────────────────────────────────────────────
 function ogImage() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -349,13 +524,18 @@ function ogImage() {
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────────
-for (const d of ['exam', 'sell', 'compress', 'signature']) rmSync(resolve(PUBLIC, d), { recursive: true, force: true })
+for (const d of ['exam', 'sell', 'compress', 'signature', 'photo-resizer', 'pan-card-photo-resizer', 'photo-resizer-in-pixels'])
+  rmSync(resolve(PUBLIC, d), { recursive: true, force: true })
 
 const urls = ['/']
+urls.push(photoResizerPillarPage())
 for (const p of EXAMS) urls.push(examPage(p))
 for (const m of MARKETPLACE_PRESETS) urls.push(sellPage(m))
 for (const kb of KB_TARGETS) urls.push(kbPage(kb))
+for (const mb of MB_TARGETS) urls.push(mbPage(mb))
 urls.push(signaturePage())
+urls.push(panCardPage())
+urls.push(pixelCmPage())
 ogImage()
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -367,18 +547,24 @@ writeFileSync(resolve(PUBLIC, 'sitemap.xml'), sitemap)
 writeFileSync(resolve(PUBLIC, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}/sitemap.xml\n`)
 
 const llms = `# SnapFit
-> Free, in-browser tools to resize & compress photos to the exact spec required by Indian competitive exams and e-commerce marketplaces. Nothing is uploaded — all processing is on-device.
+> Free, in-browser photo resizer & compressor. Resize any photo to an exact KB, MB, pixel or cm size for Indian competitive exams, ID documents (PAN, passport) and e-commerce marketplaces. Nothing is uploaded — all processing is on-device.
+
+## Photo resizer
+- [Free online photo resizer](${ORIGIN}/photo-resizer/)
+- [Photo resizer in pixels & cm](${ORIGIN}/photo-resizer-in-pixels/)
+- [PAN card photo resizer](${ORIGIN}/pan-card-photo-resizer/)
+- [Exam signature resizer](${ORIGIN}/signature/)
+
+## Resize to an exact file size
+${KB_TARGETS.map(kb => `- [Photo resizer to ${kb} KB](${ORIGIN}/compress/${kb}kb/)`).join('\n')}
+${MB_TARGETS.map(mb => `- [Photo resizer to ${mb} MB](${ORIGIN}/compress/${mb}mb/)`).join('\n')}
 
 ## Exam photo tools
 ${EXAMS.map(p => `- [${EXAM_KW[p.id] || p.name} photo — ${p.w}×${p.h}px, ${p.min}-${p.max}KB](${ORIGIN}/exam/${p.id}/)`).join('\n')}
-- [Exam signature resizer](${ORIGIN}/signature/)
-
-## Compress to an exact file size
-${KB_TARGETS.map(kb => `- [Compress photo to ${kb} KB](${ORIGIN}/compress/${kb}kb/)`).join('\n')}
 
 ## Marketplace listing-photo tools (SnapFit Studio)
 ${MARKETPLACE_PRESETS.map(m => `- [${m.name} product photo — ${m.w}×${m.h}px, white background](${ORIGIN}/sell/${m.id}/)`).join('\n')}
 `
 writeFileSync(resolve(PUBLIC, 'llms.txt'), llms)
 
-console.log(`✓ SEO generated: ${urls.length - 1} landing pages (${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, 1 signature) + og-image + sitemap + robots + llms`)
+console.log(`✓ SEO generated: ${urls.length - 1} landing pages (${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, ${MB_TARGETS.length} MB, signature, PAN, pixel/cm, photo-resizer hub) + og-image + sitemap + robots + llms`)
