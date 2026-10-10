@@ -23,7 +23,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What photo size is needed for a PAN card?","acceptedAnswer":{"@type":"Answer","text":"PAN card applications generally ask for a recent passport-style colour photograph, about 3.5 × 2.5 cm, on a plain light or white background with the full face visible. Online forms usually want a small JPEG, often around 20–50 KB. Always confirm the exact figure on the NSDL / UTIITSL portal you are using."}},{"@type":"Question","name":"How do I resize my photo for a PAN card online?","acceptedAnswer":{"@type":"Answer","text":"Open SnapFit, choose the Custom preset, and upload your photo. Set the size you need and the maximum KB the form allows, then download the ready JPEG. Everything runs in your browser."}},{"@type":"Question","name":"Is the PAN card photo resizer free and private?","acceptedAnswer":{"@type":"Answer","text":"Yes — free, no sign-up, and your photo is processed on your device and never uploaded to any server."}}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to resize a PAN card photo","step":[{"@type":"HowToStep","name":"Upload","text":"Open SnapFit and upload a recent passport-style photo."},{"@type":"HowToStep","name":"Set the size","text":"Use the Custom preset to set the dimensions and KB limit your PAN form requires."},{"@type":"HowToStep","name":"Download","text":"Download the resized, compressed JPEG and upload it to the PAN portal."}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1200"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snapfit.in/"},{"@type":"ListItem","position":2,"name":"Photo resizer","item":"https://www.snapfit.in/photo-resizer/"},{"@type":"ListItem","position":3,"name":"PAN card","item":"https://www.snapfit.in/pan-card-photo-resizer/"}]}</script>
   <style>
     :root{--bg:#f6f8f4;--surface:#fff;--ink:#16211b;--muted:#535e56;--line:#e0e6dd;--green:#15803d;--tint:#e4f2e8}
@@ -60,11 +60,15 @@
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs"><a href="/">Home</a><span class="sep">›</span><a href="/photo-resizer/">Photo resizer</a><span class="sep">›</span><span aria-current="page">PAN card</span></nav>
     <h1>PAN card photo resizer</h1>
@@ -134,8 +138,15 @@
     </div>
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>

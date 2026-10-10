@@ -980,6 +980,7 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
               <a href="/photo-resizer-in-pixels/">Photo resizer in pixels &amp; cm</a>
               <a href="/pan-card-photo-resizer/">PAN card photo resizer</a>
               <a href="/signature/">Exam signature resizer</a>
+              <a href="/exam-photo-size-chart/">Exam photo &amp; signature size chart</a>
             </div>
           </div>
         </div>
@@ -989,11 +990,11 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
         <div style={{ fontSize: 12, color: 'var(--faint)', fontWeight: 500, maxWidth: '62ch' }}>
           © 2026 SnapFit · Photos processed locally, never uploaded · Not affiliated with NTA, UPSC, SSC or any examination body.
         </div>
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-          {['NEET', 'JEE', 'UPSC', 'SSC', 'IBPS', 'RRB', 'GATE', 'NDA', 'Passport'].map(tag => (
-            <span key={tag} style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--faint)' }}>{tag} photo</span>
+        <nav style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+          {[['/exam-photo-size-chart/', 'Exam photo size chart'], ['/about/', 'About'], ['/contact/', 'Contact'], ['/privacy/', 'Privacy policy'], ['/terms/', 'Terms']].map(([href, label]) => (
+            <a key={href} href={href} style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--faint)' }}>{label}</a>
           ))}
-        </div>
+        </nav>
       </footer>
     </div>
   )

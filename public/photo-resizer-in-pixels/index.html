@@ -23,7 +23,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I resize a photo to exact pixels?","acceptedAnswer":{"@type":"Answer","text":"Open SnapFit's Custom preset, enter the width and height in pixels, and upload your photo. It is resized to exactly those dimensions, and you can also cap the file size in KB."}},{"@type":"Question","name":"How do I resize a photo in cm?","acceptedAnswer":{"@type":"Answer","text":"Decide the print size in centimetres and convert to pixels — at 300 DPI, 1 cm is about 118 px. Enter those pixel values in the Custom preset. A common ID size of 3.5 × 4.5 cm maps to roughly 413 × 531 px."}},{"@type":"Question","name":"Will resizing to exact pixels stretch my photo?","acceptedAnswer":{"@type":"Answer","text":"SnapFit fits your photo to the frame and centres it, so faces are not stretched. You can nudge the zoom and vertical position to frame it correctly."}},{"@type":"Question","name":"Is it free and private?","acceptedAnswer":{"@type":"Answer","text":"Yes — free, no account, and every image is processed on your device."}}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to resize a photo to exact pixels","step":[{"@type":"HowToStep","name":"Open Custom","text":"Open SnapFit and choose the Custom preset."},{"@type":"HowToStep","name":"Enter size","text":"Type the exact width and height in pixels (or the cm equivalent)."},{"@type":"HowToStep","name":"Download","text":"Upload your photo, frame it, and download the resized image."}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1200"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snapfit.in/"},{"@type":"ListItem","position":2,"name":"Photo resizer","item":"https://www.snapfit.in/photo-resizer/"},{"@type":"ListItem","position":3,"name":"Pixels & cm","item":"https://www.snapfit.in/photo-resizer-in-pixels/"}]}</script>
   <style>
     :root{--bg:#f6f8f4;--surface:#fff;--ink:#16211b;--muted:#535e56;--line:#e0e6dd;--green:#15803d;--tint:#e4f2e8}
@@ -60,11 +60,15 @@
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs"><a href="/">Home</a><span class="sep">›</span><a href="/photo-resizer/">Photo resizer</a><span class="sep">›</span><span aria-current="page">Pixels &amp; cm</span></nav>
     <h1>Photo resizer in pixels and cm</h1>
@@ -138,8 +142,15 @@
     </div>
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>

@@ -23,7 +23,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does the tool bring a photo below 200 KB?","acceptedAnswer":{"@type":"Answer","text":"It re-encodes the image as JPEG and lowers the quality factor in small steps, re-saving after each step. A live preview updates as the slider moves, and processing stops the moment the file size drops under 200 KB."}},{"@type":"Question","name":"Is it safe to use for NEET, GATE, UPSC or visa photos?","acceptedAnswer":{"@type":"Answer","text":"Yes. Nothing leaves your device, so the image is not uploaded to any server. This also means there is no queue, no waiting, and no account needed. You get the final compressed photo straight from your own browser."}},{"@type":"Question","name":"Will lowering JPEG quality make my photo look bad?","acceptedAnswer":{"@type":"Answer","text":"For small head-and-shoulders photos the difference between quality 95 and quality 70 is usually hard to spot, especially at the reduced file size needed for portals. The tool lets you eyeball the result in the preview before you download, so you can trade clarity for size only as far as you are comfortable."}},{"@type":"Question","name":"Does it work on a phone, and do I need an app?","acceptedAnswer":{"@type":"Answer","text":"It works in any modern mobile browser, including on Android and iPhone, so there is nothing to install. You pick the file from your gallery, watch the size shrink in the preview, and save the compressed image back to your phone."}}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to compress a photo to 200 KB","step":[{"@type":"HowToStep","name":"Upload","text":"Open SnapFit and upload your photo."},{"@type":"HowToStep","name":"Set the target","text":"Pick a preset with a 200 KB limit, or use Custom and set the maximum to 200 KB."},{"@type":"HowToStep","name":"Download","text":"Drag the quality slider until the size is under 200 KB, then download."}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1200"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snapfit.in/"},{"@type":"ListItem","position":2,"name":"Compress","item":"https://www.snapfit.in/#compress"},{"@type":"ListItem","position":3,"name":"200 KB","item":"https://www.snapfit.in/compress/200kb/"}]}</script>
   <style>
     :root{--bg:#f6f8f4;--surface:#fff;--ink:#16211b;--muted:#535e56;--line:#e0e6dd;--green:#15803d;--tint:#e4f2e8}
@@ -60,17 +60,30 @@
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs"><a href="/">Home</a><span class="sep">›</span><a href="/#compress">Compress</a><span class="sep">›</span><span aria-current="page">200 KB</span></nav>
     <h1>Photo resizer to 200 KB online</h1>
     
     <p class="lede">Shrink a passport or exam photo to under 200 KB in your browser, with a live preview that drops JPEG quality step by step until it fits.</p>
-    <p>A 200 KB limit is common for <a href="/exam/neet/">NEET</a>, <a href="/exam/gate/">GATE</a>, <a href="/exam/upsc/">UPSC CSE</a>, <a href="/exam/visa/">US Visa 2×2"</a>. Pick the matching preset and SnapFit hits the size automatically.</p>
+    <p>A 200 KB photo falls inside the allowed range for these exams — pick the matching preset and SnapFit hits the size automatically:</p>
+    <table class="data">
+      <thead><tr><th>Exam</th><th>Photo size</th><th>Allowed file size</th></tr></thead>
+      <tbody>
+      <tr><td><a href="/exam/neet/">NEET, JEE Main &amp; CUET</a></td><td class="mono">200×230 px</td><td class="mono">10–200 KB</td></tr>
+      <tr><td><a href="/exam/gate/">GATE</a></td><td class="mono">240×320 px</td><td class="mono">5–200 KB</td></tr>
+      <tr><td><a href="/exam/upsc/">UPSC CSE</a></td><td class="mono">350×350 px</td><td class="mono">20–300 KB</td></tr>
+      <tr><td><a href="/exam/visa/">US Visa</a></td><td class="mono">600×600 px</td><td class="mono">100–240 KB</td></tr>
+      </tbody>
+    </table>
     <a class="cta" href="/?exam=custom">Resize my photo to 200 KB →</a>
     <h2>How to resize a photo to 200 KB</h2>
     <ol class="steps">
@@ -78,6 +91,8 @@
       <li>Pick a preset with a 200 KB limit, or set Custom to 200 KB.</li>
       <li>Nudge the quality slider until it fits, then download.</li>
     </ol>
+    <h2>Getting a clear photo under 200 KB</h2>
+    <p>Limits this large usually come with bigger dimensions (UPSC asks for 350×350 px, a passport photo 413×531 px) or are simply an upper bound. Don't upscale a small or blurry photo to fill the space — it gets bigger in KB without getting sharper. Start from the clearest original you have and let SnapFit resize it down to the exact pixels.</p>
     <h2>Frequently asked questions</h2>
     <details><summary>How does the tool bring a photo below 200 KB?</summary><p>It re-encodes the image as JPEG and lowers the quality factor in small steps, re-saving after each step. A live preview updates as the slider moves, and processing stops the moment the file size drops under 200 KB.</p></details>
     <details><summary>Is it safe to use for NEET, GATE, UPSC or visa photos?</summary><p>Yes. Nothing leaves your device, so the image is not uploaded to any server. This also means there is no queue, no waiting, and no account needed. You get the final compressed photo straight from your own browser.</p></details>
@@ -130,8 +145,15 @@
     </div>
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>

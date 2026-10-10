@@ -23,6 +23,11 @@ public/sell/
 public/sitemap.xml
 public/robots.txt
 public/llms.txt
+public/exam-photo-size-chart/
+public/about/
+public/contact/
+public/privacy/
+public/terms/
 
 # Editor directories and files
 .vscode/*

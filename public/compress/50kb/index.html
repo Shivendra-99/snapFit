@@ -23,7 +23,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I compress a photo to 50 KB?","acceptedAnswer":{"@type":"Answer","text":"Upload your image to SnapFit and either pick an exam preset with a 50 KB limit or open the Custom preset and set the maximum to 50 KB. The quality slider lets you trade a little sharpness for a smaller file until it fits."}},{"@type":"Question","name":"Will compressing to 50 KB ruin the quality?","acceptedAnswer":{"@type":"Answer","text":"SnapFit reduces JPEG quality gradually and shows a live preview, so you can stop at the smallest size that still looks clean. For very small limits, a tighter crop helps keep the face sharp."}},{"@type":"Question","name":"Is it free and private?","acceptedAnswer":{"@type":"Answer","text":"Yes — completely free, no sign-up, and every image is processed in your browser. Your photo is never uploaded to any server."}}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to compress a photo to 50 KB","step":[{"@type":"HowToStep","name":"Upload","text":"Open SnapFit and upload your photo."},{"@type":"HowToStep","name":"Set the target","text":"Pick a preset with a 50 KB limit, or use Custom and set the maximum to 50 KB."},{"@type":"HowToStep","name":"Download","text":"Drag the quality slider until the size is under 50 KB, then download."}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1200"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snapfit.in/"},{"@type":"ListItem","position":2,"name":"Compress","item":"https://www.snapfit.in/#compress"},{"@type":"ListItem","position":3,"name":"50 KB","item":"https://www.snapfit.in/compress/50kb/"}]}</script>
   <style>
     :root{--bg:#f6f8f4;--surface:#fff;--ink:#16211b;--muted:#535e56;--line:#e0e6dd;--green:#15803d;--tint:#e4f2e8}
@@ -60,17 +60,36 @@
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs"><a href="/">Home</a><span class="sep">›</span><a href="/#compress">Compress</a><span class="sep">›</span><span aria-current="page">50 KB</span></nav>
     <h1>Photo resizer to 50 KB online</h1>
     
     <p class="lede">Resize and compress any JPG or PNG to under 50 KB while keeping it clear enough to pass form checks — a free online photo resizer that runs entirely in your browser.</p>
-    <p>A 50 KB limit is common for <a href="/exam/neet/">NEET</a>, <a href="/exam/ugcnet/">UGC NET / SET</a>, <a href="/exam/mpsc/">MPSC / UPPSC</a>, <a href="/exam/ssc/">SSC</a>, <a href="/exam/gate/">GATE</a>, <a href="/exam/cat/">CAT (IIM)</a>, <a href="/exam/upsc/">UPSC CSE</a>, <a href="/exam/bpsc/">BPSC</a>, <a href="/exam/nda/">NDA</a>, <a href="/exam/pass/">Passport 35×45</a>. Pick the matching preset and SnapFit hits the size automatically.</p>
+    <p>A 50 KB photo falls inside the allowed range for these exams — pick the matching preset and SnapFit hits the size automatically:</p>
+    <table class="data">
+      <thead><tr><th>Exam</th><th>Photo size</th><th>Allowed file size</th></tr></thead>
+      <tbody>
+      <tr><td><a href="/exam/neet/">NEET, JEE Main &amp; CUET</a></td><td class="mono">200×230 px</td><td class="mono">10–200 KB</td></tr>
+      <tr><td><a href="/exam/ugcnet/">UGC NET</a></td><td class="mono">200×230 px</td><td class="mono">10–100 KB</td></tr>
+      <tr><td><a href="/exam/mpsc/">MPSC &amp; UPPSC</a></td><td class="mono">200×230 px</td><td class="mono">10–50 KB</td></tr>
+      <tr><td><a href="/exam/ssc/">SSC, IBPS &amp; CTET</a></td><td class="mono">200×230 px</td><td class="mono">20–50 KB</td></tr>
+      <tr><td><a href="/exam/gate/">GATE</a></td><td class="mono">240×320 px</td><td class="mono">5–200 KB</td></tr>
+      <tr><td><a href="/exam/cat/">CAT</a></td><td class="mono">100×130 px</td><td class="mono">10–50 KB</td></tr>
+      <tr><td><a href="/exam/upsc/">UPSC CSE</a></td><td class="mono">350×350 px</td><td class="mono">20–300 KB</td></tr>
+      <tr><td><a href="/exam/bpsc/">BPSC</a></td><td class="mono">215×265 px</td><td class="mono">10–50 KB</td></tr>
+      <tr><td><a href="/exam/nda/">NDA, CDS &amp; AFCAT</a></td><td class="mono">200×240 px</td><td class="mono">10–50 KB</td></tr>
+      <tr><td><a href="/exam/pass/">Passport</a></td><td class="mono">413×531 px</td><td class="mono">20–100 KB</td></tr>
+      </tbody>
+    </table>
     <a class="cta" href="/?exam=custom">Resize my photo to 50 KB →</a>
     <h2>How to resize a photo to 50 KB</h2>
     <ol class="steps">
@@ -78,6 +97,8 @@
       <li>Pick a preset with a 50 KB limit, or set Custom to 50 KB.</li>
       <li>Nudge the quality slider until it fits, then download.</li>
     </ol>
+    <h2>Getting a clear photo under 50 KB</h2>
+    <p>50 KB is comfortable for a standard exam photo of around 200×230 px at good quality. If your file is still too big, the original is almost certainly a full-size phone photo — once it is resized to the required pixels, only a light quality reduction is usually needed. Check the minimum as well: many forms that cap the size at 50 KB also reject files below 10–20 KB.</p>
     <h2>Frequently asked questions</h2>
     <details><summary>How do I compress a photo to 50 KB?</summary><p>Upload your image to SnapFit and either pick an exam preset with a 50 KB limit or open the Custom preset and set the maximum to 50 KB. The quality slider lets you trade a little sharpness for a smaller file until it fits.</p></details>
     <details><summary>Will compressing to 50 KB ruin the quality?</summary><p>SnapFit reduces JPEG quality gradually and shows a live preview, so you can stop at the smallest size that still looks clean. For very small limits, a tighter crop helps keep the face sharp.</p></details>
@@ -129,8 +150,15 @@
     </div>
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>

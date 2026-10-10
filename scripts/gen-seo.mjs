@@ -29,6 +29,14 @@ const COPY = JSON.parse(readFileSync(resolve(__dirname, 'seo-copy.json'), 'utf8'
 // "Photo resizer to N MB" targets (KB_TARGETS comes from the shared lib).
 const MB_TARGETS = [1, 2]
 
+// ID-photo presets carry a placeholder sig spec for the editor, but passport and
+// visa forms have no signature upload — keep them out of published signature data.
+const NO_SIG = new Set(['pass', 'visa'])
+
+// Published on /about/ and /contact/ (AdSense reviewers expect a real, reachable owner).
+const OWNER = 'Shivendra Kumar Sonkar'
+const CONTACT_EMAIL = 'shivendrasonkar001@gmail.com'
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const att = (s) => esc(s).replace(/"/g, '&quot;')
 
@@ -43,7 +51,6 @@ const softwareApp = () => ({
   '@context': 'https://schema.org', '@type': 'SoftwareApplication',
   name: 'SnapFit', applicationCategory: 'MultimediaApplication', operatingSystem: 'Any (web browser)',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
-  aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', ratingCount: '1200' },
 })
 const breadcrumbLD = (crumbs) => ({
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
@@ -79,9 +86,10 @@ const CLOUD = `
     </div>`
 
 // ─── Page shell ───────────────────────────────────────────────────────────────
-function pageHtml({ url, title, description, h1, crumbs, jsonld, body }) {
+// plain = info/legal page: no tool schema, ad unit or tool link cloud.
+function pageHtml({ url, title, description, h1, crumbs, jsonld, body, plain = false }) {
   const canonical = `${ORIGIN}${url}`
-  const allLd = [...jsonld, softwareApp(), breadcrumbLD(crumbs)]
+  const allLd = [...jsonld, ...(plain ? [] : [softwareApp()]), breadcrumbLD(crumbs)]
   const ld = allLd.map(o => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join('\n    ')
   const crumbNav = crumbs.map((c, i) =>
     i === crumbs.length - 1 ? `<span aria-current="page">${esc(c.name)}</span>` : `<a href="${c.url}">${esc(c.name)}</a>`
@@ -145,21 +153,32 @@ function pageHtml({ url, title, description, h1, crumbs, jsonld, body }) {
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs">${crumbNav}</nav>
     <h1>${esc(h1)}</h1>
     ${body}
-    ${adUnit(AD_SLOTS.landing)}
-    ${CLOUD}
+    ${plain ? '' : adUnit(AD_SLOTS.landing)}
+    ${plain ? '' : CLOUD}
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>`
@@ -272,8 +291,20 @@ function kbPage(kb) {
   const lede = c?.lede ?? `Resize and compress any JPG or PNG to under ${kb} KB while keeping it clear enough to pass form checks — a free online photo resizer that runs entirely in your browser.`
   const uses = EXAMS.filter(p => kb >= p.min && kb <= p.max)
   const useList = uses.length
-    ? `<p>A ${kb} KB limit is common for ${uses.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])}</a>`).join(', ')}. Pick the matching preset and SnapFit hits the size automatically.</p>`
+    ? `<p>A ${kb} KB photo falls inside the allowed range for these exams — pick the matching preset and SnapFit hits the size automatically:</p>
+    <table class="data">
+      <thead><tr><th>Exam</th><th>Photo size</th><th>Allowed file size</th></tr></thead>
+      <tbody>
+      ${uses.map(p => `<tr><td><a href="/exam/${p.id}/">${esc(EXAM_KW[p.id] || p.name)}</a></td><td class="mono">${p.w}×${p.h} px</td><td class="mono">${p.min}–${p.max} KB</td></tr>`).join('\n      ')}
+      </tbody>
+    </table>`
     : `<p>Choose the <a href="/?exam=custom">Custom preset</a>, set the maximum size to ${kb} KB, and SnapFit compresses your photo to fit.</p>`
+  // Size-specific advice — what actually goes wrong differs a lot between a 10 KB and a 200 KB limit.
+  const tip = kb <= 20
+    ? `${kb} KB is a tight limit, so every byte counts. Keep the pixel size small — resizing a phone photo down to the form's dimensions does most of the work before any quality is lost. Crop close to the face, and use a plain, evenly lit background: flat areas compress far better in JPEG than a patterned wall or shadows, so a clean white backdrop alone can save several KB.`
+    : kb <= 50
+    ? `${kb} KB is comfortable for a standard exam photo of around 200×230 px at good quality. If your file is still too big, the original is almost certainly a full-size phone photo — once it is resized to the required pixels, only a light quality reduction is usually needed. Check the minimum as well: many forms that cap the size at ${kb} KB also reject files below 10–20 KB.`
+    : `Limits this large usually come with bigger dimensions (UPSC asks for 350×350 px, a passport photo 413×531 px) or are simply an upper bound. Don't upscale a small or blurry photo to fill the space — it gets bigger in KB without getting sharper. Start from the clearest original you have and let SnapFit resize it down to the exact pixels.`
   const faqs = c?.faqs ?? [
     { q: `How do I compress a photo to ${kb} KB?`, a: `Upload your image to SnapFit and either pick an exam preset with a ${kb} KB limit or open the Custom preset and set the maximum to ${kb} KB. The quality slider lets you trade a little sharpness for a smaller file until it fits.` },
     { q: `Will compressing to ${kb} KB ruin the quality?`, a: `SnapFit reduces JPEG quality gradually and shows a live preview, so you can stop at the smallest size that still looks clean. For very small limits, a tighter crop helps keep the face sharp.` },
@@ -297,6 +328,8 @@ function kbPage(kb) {
       <li>Pick a preset with a ${kb} KB limit, or set Custom to ${kb} KB.</li>
       <li>Nudge the quality slider until it fits, then download.</li>
     </ol>
+    <h2>Getting a clear photo under ${kb} KB</h2>
+    <p>${esc(tip)}</p>
     <h2>Frequently asked questions</h2>
     ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
   write(`compress/${kb}kb/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Compress', url: '/#compress' }, { name: `${kb} KB`, url }], jsonld, body }))
@@ -311,7 +344,7 @@ function signaturePage() {
   const description = c?.description ?? `Resize your signature to the exact size Indian exam forms need — SSC, UPSC, NEET, IBPS, RRB and more. Free signature compressor, 100% in your browser, no upload.`
   const h1 = `Exam signature resizer: the exact size for every form`
   const lede = c?.lede ?? `Every Indian exam wants the signature at its own pixel and KB size. Find yours below and resize it in seconds — free and private in your browser.`
-  const rows = EXAMS.filter(p => p.sig).map(p =>
+  const rows = EXAMS.filter(p => p.sig && !NO_SIG.has(p.id)).map(p =>
     `<tr><td><a href="/?exam=${p.id}&sig=1">${esc(p.name.split(',')[0])}</a></td><td class="mono">${p.sig.w}×${p.sig.h} px</td><td class="mono">${p.sig.min}–${p.sig.max} KB</td></tr>`
   ).join('\n      ')
   const faqs = c?.faqs ?? [
@@ -514,6 +547,143 @@ function pixelCmPage() {
   return url
 }
 
+// ─── Exam photo & signature size chart (long-form guide) ───────────────────────
+function sizeChartPage() {
+  const url = `/exam-photo-size-chart/`
+  const title = `Exam Photo & Signature Size Chart 2026 — NEET, SSC, UPSC, IBPS & More | SnapFit`
+  const description = `Photo and signature size for every major Indian exam in one chart — pixels, KB limits and background — plus the common reasons exam photos get rejected and how to take one at home.`
+  const h1 = `Exam photo and signature size chart (2026)`
+  const sigCell = (p, k) => NO_SIG.has(p.id) ? '—' : k === 'px' ? `${p.sig.w}×${p.sig.h} px` : `${p.sig.min}–${p.sig.max} KB`
+  const rows = EXAMS.map(p => `<tr><td><a href="/exam/${p.id}/">${esc(EXAM_KW[p.id] || p.name)}</a></td><td class="mono">${p.w}×${p.h} px</td><td class="mono">${p.min}–${p.max} KB</td><td class="mono">${sigCell(p, 'px')}</td><td class="mono">${sigCell(p, 'kb')}</td></tr>`).join('\n      ')
+  const jsonld = [{
+    '@context': 'https://schema.org', '@type': 'Article', headline: h1, description,
+    dateModified: TODAY, author: { '@type': 'Person', name: OWNER, url: `${ORIGIN}/about/` },
+    publisher: { '@type': 'Organization', name: 'SnapFit', url: `${ORIGIN}/` },
+  }]
+  const body = `
+    <p class="lede">Every exam portal checks your photo and signature against its own pixel and file-size limits, and a mismatch is one of the most common reasons an application gets stuck. Here are the specs SnapFit's presets use, side by side — followed by the mistakes that get photos rejected and how to take one at home that passes first time.</p>
+    <div style="overflow-x:auto">
+    <table class="data">
+      <thead><tr><th>Exam</th><th>Photo</th><th>Photo file</th><th>Signature</th><th>Signature file</th></tr></thead>
+      <tbody>
+      ${rows}
+      </tbody>
+    </table>
+    </div>
+    <p style="font-size:14px;color:var(--muted)">All photos and signatures are uploaded as JPEG (.jpg). Click an exam for its full guide and a one-click preset.</p>
+
+    <h2>How to read this chart</h2>
+    <p><strong>Pixels (px)</strong> are the image's width × height. <strong>KB</strong> is the file size after it is saved as a JPEG. Portals usually check both, so a photo with the right dimensions can still be rejected for being too large — or too small, because most forms also set a <em>minimum</em> file size. A photo of 5 KB on a form that asks for 10–50 KB fails just as surely as one of 80 KB.</p>
+    <p>Several exams share one spec. NEET, JEE Main and CUET (all conducted by NTA) use the same limits, and so do SSC, IBPS, SBI, RBI, LIC and CTET — which is why they share a preset in SnapFit.</p>
+
+    <h2>Why exam photos get rejected</h2>
+    <ul>
+      <li><strong>Wrong dimensions or file size.</strong> The most common problem and the easiest to fix. A photo straight from a phone is typically 3000+ px wide and several MB, far beyond any exam limit.</li>
+      <li><strong>Background that isn't plain and light.</strong> Patterned walls, doors, curtains or a dark shadow behind the head. Most exams want plain white or a very light colour.</li>
+      <li><strong>Face too small or cut off.</strong> Notifications typically ask for the face to fill most of the frame — roughly 70–80% — with the full face, both ears and the top of the shoulders visible. A full-body or half-body shot cropped down will look tiny.</li>
+      <li><strong>Caps, dark glasses or face coverings.</strong> These are not accepted; religious headwear is generally allowed as long as the face is fully visible. If you wear spectacles, avoid glare on the lenses.</li>
+      <li><strong>Blurry, dark or filtered photos.</strong> Beauty filters, portrait-mode blur, low light and heavy compression artefacts can all lead to rejection — or to trouble at the exam centre when staff compare the photo with your face.</li>
+      <li><strong>An old photo.</strong> Several exams require a recent photograph; UPSC, for example, has in recent cycles asked for a photo no more than 10 days old with your name and the date printed on it. Your notification has the current rule.</li>
+      <li><strong>Photo and signature mixed up.</strong> Uploading the signature in the photo field (or the reverse) happens more often than you'd think when the two files have similar names. Name them clearly before you start.</li>
+    </ul>
+
+    <h2>How to take an exam photo at home</h2>
+    <ol class="steps">
+      <li>Stand about a metre in front of a plain white or light wall, facing a window so daylight falls evenly on your face. Avoid a single overhead bulb — it throws shadows under the eyes.</li>
+      <li>Ask someone to take the photo at eye level with the phone's rear camera, held straight rather than tilted. The rear camera is sharper than the selfie camera and avoids the stretched look of an arm's-length shot.</li>
+      <li>Look straight at the lens with a neutral expression and mouth closed. Keep your head and the top of your shoulders in frame, and turn off beauty mode and filters.</li>
+      <li>Take a few shots and keep the sharpest one. Then open SnapFit, pick your exam, and it crops to the exact pixels, cleans the background to white and compresses within the KB range — all on your device.</li>
+    </ol>
+
+    <h2>Signature tips</h2>
+    <ul>
+      <li>Sign on plain white paper with a black or dark-blue pen. A slightly thicker nib scans much more cleanly than a fine ballpoint.</li>
+      <li>Sign in your normal running hand. Some exams — IBPS among them — do not accept a signature written in capital letters.</li>
+      <li>Photograph it straight-on in good light, then crop close around the signature so it fills the frame.</li>
+      <li>Use the same signature you will sign at the exam centre; invigilators compare the two.</li>
+    </ul>
+    <p>The <a href="/signature/">signature resizer</a> has the per-exam signature sizes and a one-click mode for each.</p>
+
+    <h2>Always check the official notification</h2>
+    <p>Requirements can change from one exam cycle to the next. The numbers above are the ones SnapFit's presets use, and they're updated as new notifications come out — but the notification for your exam is the final word. If a number here doesn't match your notification, <a href="/contact/">let us know</a> and we'll fix the preset.</p>`
+  write(`exam-photo-size-chart/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Exam photo size chart', url }], jsonld, body }))
+  return url
+}
+
+// ─── About / Contact / Privacy / Terms ─────────────────────────────────────────
+const POLICY_DATE = '10 October 2026'
+const mail = `<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>`
+
+function infoPage(slug, name, title, description, body) {
+  const url = `/${slug}/`
+  write(`${slug}/index.html`, pageHtml({ url, title, description, h1: name, crumbs: [{ name: 'Home', url: '/' }, { name, url }], jsonld: [], body, plain: true }))
+  return url
+}
+
+const aboutPage = () => infoPage('about', 'About SnapFit', 'About SnapFit — Free Exam & ID Photo Resizer', `SnapFit is a free, in-browser tool for resizing exam, ID and marketplace photos to exact specs. Built and maintained by ${OWNER}.`, `
+    <p class="lede">SnapFit is a free tool that resizes photos and signatures to the exact pixel and file-size limits that Indian exam portals, ID applications and online marketplaces ask for — without uploading your photo anywhere.</p>
+    <h2>Why it exists</h2>
+    <p>Every exam portal wants something slightly different: 200×230 px and 10–200 KB for one form, 350×350 px and 20–300 KB for the next, a signature at 140×60 px for a third. Getting it wrong means a rejected upload at the worst possible moment — close to the deadline. The usual options are a trip to a cyber café, or a website that uploads your face and ID photo to its servers.</p>
+    <p>SnapFit does the whole job on your own device. Pick your exam, upload a photo, and it is cropped to the right dimensions, the background cleaned to white and the file compressed into the allowed KB range in a few seconds.</p>
+    <h2>Who makes it</h2>
+    <p>SnapFit is built and maintained by ${esc(OWNER)}, an independent software developer. It started as a tool to stop people losing time to photo-upload errors on exam forms, and has grown to cover ID photos, signatures and product photos for sellers on Amazon.in, Flipkart, Meesho and other marketplaces.</p>
+    <h2>How it works</h2>
+    <ul>
+      <li><strong>On-device processing.</strong> Resizing, cropping, background removal and compression all run in your browser. The AI background-removal model is downloaded to your browser and runs locally; your photo is never sent to a server.</li>
+      <li><strong>Presets kept up to date.</strong> Each exam and marketplace preset is based on the requirements published in official notifications and seller guidelines, and is updated when those change. See the full <a href="/exam-photo-size-chart/">exam photo size chart</a>.</li>
+      <li><strong>Free.</strong> SnapFit is free to use, with no sign-up and no watermark, and is supported by advertising.</li>
+    </ul>
+    <h2>Not affiliated</h2>
+    <p>SnapFit is an independent tool and is not affiliated with NTA, UPSC, SSC, IBPS, any other examination body, or any marketplace. Always confirm requirements in your official notification before submitting.</p>
+    <p>Questions or a spec that looks out of date? <a href="/contact/">Get in touch</a>.</p>`)
+
+const contactPage = () => infoPage('contact', 'Contact', 'Contact SnapFit', 'Get in touch with SnapFit — report an outdated exam photo spec, a bug, or send a feature request.', `
+    <p class="lede">Questions, bug reports and corrections are all welcome. Email ${mail}.</p>
+    <h2>What to write about</h2>
+    <ul>
+      <li><strong>An outdated or wrong spec.</strong> Exam requirements change between cycles. Tell us the exam, the number you expected, and a link to the official notification, and we'll update the preset.</li>
+      <li><strong>Something not working.</strong> Mention your device, browser and what you were trying to do — for example "Android, Chrome, NEET preset, background stays grey".</li>
+      <li><strong>A missing exam or marketplace.</strong> Tell us which one and where its photo requirements are published.</li>
+      <li><strong>Privacy questions.</strong> See the <a href="/privacy/">privacy policy</a>, or email us.</li>
+    </ul>
+    <h2>Please don't email your photos</h2>
+    <p>We never need your photo, signature or ID documents to help you — SnapFit is designed so they stay on your device. A description of the problem, or a screenshot with personal details covered, is all we need.</p>`)
+
+const privacyPage = () => infoPage('privacy', 'Privacy policy', 'Privacy Policy — SnapFit', 'How SnapFit handles your data: photos are processed on your device and never uploaded. Details on advertising cookies, analytics and contact.', `
+    <p class="lede">Last updated: ${POLICY_DATE}. This policy explains what information SnapFit (www.snapfit.in) handles and how. The short version: your photos and signatures are processed on your own device and are never uploaded to us.</p>
+    <h2>Your photos and signatures</h2>
+    <p>All photo processing — resizing, cropping, background removal and compression — happens inside your web browser. The images you open in SnapFit are not uploaded to our servers or anyone else's, and we cannot see them. When you close the page, they are gone.</p>
+    <h2>Notice screenshot auto-fill (optional)</h2>
+    <p>If you choose to use the feature that reads photo requirements from a screenshot of an exam notice, that screenshot (not your photo) is sent to our server and passed to a third-party AI service (OpenRouter and the model provider it routes to) to extract the size requirements. We don't store the screenshot. Avoid using this feature with screenshots that contain personal details.</p>
+    <h2>Advertising and cookies</h2>
+    <p>SnapFit shows ads served by Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on your previous visits to this and other websites. Google's use of advertising cookies enables it and its partners to serve ads to you based on your visits to this site and/or other sites on the internet.</p>
+    <p>You can opt out of personalised advertising in <a href="https://adssettings.google.com" rel="nofollow">Google Ads Settings</a>, or opt out of some third-party vendors' use of cookies at <a href="https://www.aboutads.info/choices/" rel="nofollow">aboutads.info</a>. To learn more, see <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow">how Google uses information from sites that use its services</a>.</p>
+    <h2>Analytics</h2>
+    <p>We use Vercel Web Analytics to count page views and understand which pages are useful. It does not use cookies and reports only aggregated data — it does not identify you personally.</p>
+    <h2>Stored on your device</h2>
+    <p>SnapFit saves your light/dark theme choice in your browser's local storage. Nothing else is stored, and you can clear it at any time through your browser settings.</p>
+    <h2>Third-party resources</h2>
+    <p>To run background removal in your browser, SnapFit downloads model files from Google's servers and the jsDelivr CDN. Like any web request, these services receive your IP address and browser details; no photo data is sent.</p>
+    <h2>Children</h2>
+    <p>SnapFit is a general-audience tool and does not knowingly collect personal information from anyone, including children.</p>
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, we'll update the date at the top of this page. Questions about privacy? Email ${mail}.</p>`)
+
+const termsPage = () => infoPage('terms', 'Terms of use', 'Terms of Use — SnapFit', 'The terms for using SnapFit, a free in-browser photo and signature resizer.', `
+    <p class="lede">Last updated: ${POLICY_DATE}. By using SnapFit (www.snapfit.in) you agree to these terms.</p>
+    <h2>The service</h2>
+    <p>SnapFit is a free tool for resizing, cropping and compressing photos and signatures. It runs in your browser and is provided "as is", without any warranty. We may change, suspend or discontinue any part of it at any time.</p>
+    <h2>Check the official requirements</h2>
+    <p>Presets reflect exam, ID and marketplace requirements as we understand them, but requirements change and mistakes are possible. You are responsible for confirming that your final photo and signature meet the official notification or guideline before you submit. SnapFit is not responsible for rejected applications or listings.</p>
+    <h2>Your content</h2>
+    <p>You keep all rights to the images you process. Only use images you have the right to use, and don't use SnapFit to create misleading or fraudulent documents or to impersonate anyone.</p>
+    <h2>Limitation of liability</h2>
+    <p>To the extent permitted by law, SnapFit and its maintainer are not liable for any loss arising from use of the service.</p>
+    <h2>Not affiliated</h2>
+    <p>SnapFit is independent and not affiliated with any examination body, government department or marketplace. Names of exams and marketplaces are used only to describe their photo requirements.</p>
+    <h2>Contact</h2>
+    <p>Questions about these terms? Email ${mail}.</p>`)
+
 // ─── OG share image (SVG) ─────────────────────────────────────────────────────
 function ogImage() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -533,7 +703,7 @@ function ogImage() {
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────────
-for (const d of ['exam', 'sell', 'compress', 'signature', 'photo-resizer', 'pan-card-photo-resizer', 'photo-resizer-in-pixels'])
+for (const d of ['exam', 'sell', 'compress', 'signature', 'photo-resizer', 'pan-card-photo-resizer', 'photo-resizer-in-pixels', 'exam-photo-size-chart', 'about', 'contact', 'privacy', 'terms'])
   rmSync(resolve(PUBLIC, d), { recursive: true, force: true })
 
 const urls = ['/']
@@ -545,6 +715,8 @@ for (const mb of MB_TARGETS) urls.push(mbPage(mb))
 urls.push(signaturePage())
 urls.push(panCardPage())
 urls.push(pixelCmPage())
+urls.push(sizeChartPage())
+urls.push(aboutPage(), contactPage(), privacyPage(), termsPage())
 ogImage()
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -563,6 +735,7 @@ const llms = `# SnapFit
 - [Photo resizer in pixels & cm](${ORIGIN}/photo-resizer-in-pixels/)
 - [PAN card photo resizer](${ORIGIN}/pan-card-photo-resizer/)
 - [Exam signature resizer](${ORIGIN}/signature/)
+- [Exam photo & signature size chart](${ORIGIN}/exam-photo-size-chart/)
 
 ## Resize to an exact file size
 ${KB_TARGETS.map(kb => `- [Photo resizer to ${kb} KB](${ORIGIN}/compress/${kb}kb/)`).join('\n')}
@@ -576,4 +749,4 @@ ${MARKETPLACE_PRESETS.map(m => `- [${m.name} product photo — ${m.w}×${m.h}px,
 `
 writeFileSync(resolve(PUBLIC, 'llms.txt'), llms)
 
-console.log(`✓ SEO generated: ${urls.length - 1} landing pages (${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, ${MB_TARGETS.length} MB, signature, PAN, pixel/cm, photo-resizer hub) + og-image + sitemap + robots + llms`)
+console.log(`✓ SEO generated: ${urls.length - 1} pages (size chart, about, contact, privacy, terms, ${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, ${MB_TARGETS.length} MB, signature, PAN, pixel/cm, photo-resizer hub) + og-image + sitemap + robots + llms`)

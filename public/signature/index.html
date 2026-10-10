@@ -23,7 +23,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What pixel size and file weight should a scanned signature have for Indian government exams?","acceptedAnswer":{"@type":"Answer","text":"Most Indian exam portals ask for a signature between 10 KB and 50 KB, but the pixel box varies. NEET, UGC NET, GATE, UPSC, BPSC, NDA, passport and visa forms want 200×100 px. SSC and TNPSC want 200×80 px. CAT asks for 150×75 px and RRB for 140×60 px. File-weight limits differ too: SSC is tightest at 10-20 KB, GATE is the most generous at 4-200 KB, and RRB and TNPSC cap at 40 KB. Sign on plain white paper, photograph it flat, then crop and compress in this tool to the dimensions listed above."}},{"@type":"Question","name":"Do I need to upload my signature anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The resize, crop and compress steps run entirely inside your browser. The image is never sent to a server, so it stays on your own device throughout."}},{"@type":"Question","name":"Is the tool free and does it need an account?","acceptedAnswer":{"@type":"Answer","text":"Yes on both counts. There is no charge, no login, no email verification and no watermark added to the final image."}},{"@type":"Question","name":"Why does my uploaded signature look blurry after resizing?","acceptedAnswer":{"@type":"Answer","text":"Starting from a well-lit photograph taken straight above the signed paper keeps the source sharp. Crop close to the ink before resizing, because enlarging a small crop to fit 200×100 px or 140×60 px is what softens the strokes. Compressing once to the required file weight, rather than several times, also preserves edges."}}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to resize an exam signature","step":[{"@type":"HowToStep","name":"Scan","text":"Sign on white paper and take a clear photo of it."},{"@type":"HowToStep","name":"Pick exam & signature mode","text":"Open SnapFit, choose your exam, and switch to Signature mode."},{"@type":"HowToStep","name":"Download","text":"Download the resized, compressed signature and upload it to the form."}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1200"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SnapFit","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snapfit.in/"},{"@type":"ListItem","position":2,"name":"Signature","item":"https://www.snapfit.in/signature/"}]}</script>
   <style>
     :root{--bg:#f6f8f4;--surface:#fff;--ink:#16211b;--muted:#535e56;--line:#e0e6dd;--green:#15803d;--tint:#e4f2e8}
@@ -60,11 +60,15 @@
     details p{margin:0 0 14px;color:var(--muted)}
     .cloud{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
     .cloud a{font-size:13px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--muted)}
+    main ul{padding-left:20px}
+    main ul li{margin:7px 0}
+    .foot{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+    .foot a{color:var(--muted)}
     footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="/"><span class="logo">◈</span> SnapFit</a></div></header>
+  <header><div class="wrap"><a class="brand" href="/"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2.5"/><circle cx="12" cy="13" r="3.4"/><path d="M8 6l1.4-2.4h5.2L16 6"/></svg></span> SnapFit</a></div></header>
   <main class="wrap">
     <nav class="crumbs"><a href="/">Home</a><span class="sep">›</span><span aria-current="page">Signature</span></nav>
     <h1>Exam signature resizer: the exact size for every form</h1>
@@ -84,8 +88,6 @@
       <tr><td><a href="/?exam=tnpsc&sig=1">TNPSC</a></td><td class="mono">200×80 px</td><td class="mono">10–40 KB</td></tr>
       <tr><td><a href="/?exam=rrb&sig=1">RRB / NTPC</a></td><td class="mono">140×60 px</td><td class="mono">10–40 KB</td></tr>
       <tr><td><a href="/?exam=nda&sig=1">NDA</a></td><td class="mono">200×100 px</td><td class="mono">10–50 KB</td></tr>
-      <tr><td><a href="/?exam=pass&sig=1">Passport 35×45</a></td><td class="mono">200×100 px</td><td class="mono">10–50 KB</td></tr>
-      <tr><td><a href="/?exam=visa&sig=1">US Visa 2×2"</a></td><td class="mono">200×100 px</td><td class="mono">10–50 KB</td></tr>
       </tbody>
     </table>
     <a class="cta" href="/?exam=ssc&sig=1">Resize my signature →</a>
@@ -147,8 +149,15 @@
     </div>
   </main>
   <footer class="wrap">
+    <nav class="foot">
+      <a href="/">Home</a>
+      <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy policy</a>
+      <a href="/terms/">Terms</a>
+    </nav>
     Photos are processed entirely in your browser — nothing is uploaded. Specifications are illustrative and can change; always confirm the exact requirement in the official notification before you submit. Not affiliated with any examination body or marketplace.
-    · <a href="/">SnapFit home</a>
   </footer>
 </body>
 </html>
