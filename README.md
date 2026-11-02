@@ -13,10 +13,12 @@ It helps users prepare passport and exam photos for Indian exams like NEET, JEE,
 - Custom preset support for any width, height, and KB range
 - 100% in-browser processing — no uploads, no server storage
 - PDF compressor with before/after preview and quality slider
+- QR code generator with optional centre logo, custom colours and PNG / PDF download
 
 ## Tech stack
 
 - React
+- `qrcode` for QR generation
 - Vite
 - Emotion (`@emotion/react`, `@emotion/styled`)
 - `pdfjs-dist` and `jspdf` for client-side PDF handling

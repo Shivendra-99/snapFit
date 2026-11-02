@@ -1,7 +1,7 @@
 // ─── SnapFit SEO landing-page generator ───────────────────────────────────────
 // Emits static, crawlable HTML pages into public/ (Vite copies public/ → dist/
 // verbatim, so each page is served on its own URL while the React SPA stays at
-// /). Page types: /exam/<id>/, /sell/<id>/, /compress/<kb>kb/, /signature/.
+// /). Page types: /exam/<id>/, /sell/<id>/, /compress/<kb>kb/, /signature/, /qr-code-generator/.
 // Also writes an OG image, sitemap.xml, robots.txt and llms.txt. Run standalone
 // or via `npm run build` (wired to run first).
 //
@@ -15,6 +15,7 @@ import {
   examKey, sellKey, kbKey, sigKey,
 } from './seo-copy-lib.mjs'
 import { AD_CLIENT, AD_SLOTS } from '../src/adConfig.js'
+import { GUIDES } from './guides.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT   = resolve(__dirname, '..')
@@ -73,6 +74,7 @@ const CLOUD = `
       <a href="/photo-resizer-in-pixels/">Resize in pixels &amp; cm</a>
       <a href="/pan-card-photo-resizer/">PAN card photo</a>
       <a href="/signature/">Signature resizer</a>
+      <a href="/qr-code-generator/">QR code generator</a>
     </div>
     <div class="cloud" style="margin-top:10px">
       ${EXAMS.map(p => `<a href="/exam/${p.id}/">${esc(p.name.split(',')[0])} photo</a>`).join('\n      ')}
@@ -173,6 +175,7 @@ function pageHtml({ url, title, description, h1, crumbs, jsonld, body, plain = f
     <nav class="foot">
       <a href="/">Home</a>
       <a href="/exam-photo-size-chart/">Exam photo size chart</a>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
       <a href="/privacy/">Privacy policy</a>
@@ -378,6 +381,94 @@ function signaturePage() {
     <h2>Frequently asked questions</h2>
     ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
   write(`signature/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Signature', url }], jsonld, body }))
+  return url
+}
+
+// ─── QR code generator page ───────────────────────────────────────────────────
+function qrPage() {
+  const url = `/qr-code-generator/`
+  const title = `Free QR Code Generator with Logo — Website QR Code | SnapFit`
+  const description = `Make a QR code for your website link or any text, add your own logo in the middle, pick colours and download it as a high-resolution PNG or print-ready PDF. Free, no sign-up, made in your browser.`
+  const h1 = `Free QR code generator with logo`
+  const faqs = [
+    { q: `Can I put my logo inside the QR code?`, a: `Yes. Click Add logo, choose your image, and it is placed in the centre. When a logo is used SnapFit switches to the highest error-correction level so the code still scans. Keep the logo small and test the code with your phone before printing.` },
+    { q: `Is the QR code free, and does it expire?`, a: `It is free and it never expires. The QR code simply contains your link or text — there is no tracking redirect, so it keeps working as long as your website does.` },
+    { q: `Is my link uploaded anywhere?`, a: `No. The QR code is drawn in your browser. Your link, text and logo are never sent to a server.` },
+    { q: `Can I download the QR code as a PDF?`, a: `Yes. Use the Download PDF button for a print-ready A4 page, or Download PNG for an image you can drop into a design, a document or a WhatsApp message.` },
+    { q: `Will my QR code stop working?`, a: `No. The code holds your link directly, so it works for as long as that link does. If you later change where the link points, you will need to make a new code.` },
+    { q: `What size is the downloaded image?`, a: `The PNG is 1024 × 1024 px, sharp enough for print and for sharing on screen. The PDF is an A4 page with the QR code centred at 12 cm square, ready to print.` },
+  ]
+  const jsonld = [
+    faqLD(faqs),
+    howToLD('How to make a QR code with a logo', [
+      { n: 'Enter your link', t: 'Paste your website link or any text.' },
+      { n: 'Add your logo', t: 'Optionally upload a logo and choose its size and the QR colours.' },
+      { n: 'Download', t: 'Download the QR code as a PNG or a print-ready PDF and test-scan it with your phone.' },
+    ]),
+  ]
+  const body = `
+    <p class="lede">Turn a website link into a QR code in seconds — add your logo, pick your colours and download it as a PNG or a print-ready PDF. Free and private in your browser.</p>
+    <a class="cta" href="/?tool=qr">Create my QR code →</a>
+    <h2>How to make a QR code with your logo</h2>
+    <ol class="steps">
+      <li>Paste your website link (or any text) into the box.</li>
+      <li>Optionally add your logo and choose the colours.</li>
+      <li>Download it as a PNG or PDF, then scan it with your phone once to check it.</li>
+    </ol>
+    <h2>What you can do with it</h2>
+    <ul>
+      <li><strong>Logo in the centre.</strong> Upload your brand mark and resize it; the code switches to maximum error correction so it still scans.</li>
+      <li><strong>Your colours.</strong> Choose the QR and background colours to match your brand.</li>
+      <li><strong>PNG or PDF.</strong> A 1024 px PNG for screens and designs, or an A4 PDF to print straight away.</li>
+      <li><strong>Private.</strong> Your link, text and logo never leave your browser.</li>
+    </ul>
+    <h2>Where to use a QR code</h2>
+    <p>Visiting cards, shop windows, product packaging, posters, menus, brochures and social media profiles — anywhere you want people to reach your website with one scan.</p>
+    <h2>Tips for a QR code that scans</h2>
+    <p>Use a dark QR colour on a light background — low contrast is the most common reason a code fails. Keep the logo to about a fifth of the width, and leave the white border around the code in place when you print it.</p>
+    <h2>Frequently asked questions</h2>
+    ${faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n    ')}`
+  write(`qr-code-generator/index.html`, pageHtml({ url, title, description, h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'QR code generator', url }], jsonld, body }))
+  return url
+}
+
+// ─── Guides (original long-form articles, see guides.mjs) ──────────────────────
+const GUIDE_DATE = '2026-11-02'
+const GUIDE_LINKS = `
+    <h2>More guides</h2>
+    <ul>
+      ${GUIDES.map(g => `<li><a href="/guides/${g.slug}/">${esc(g.h1)}</a></li>`).join('\n      ')}
+    </ul>`
+
+function guidePage(g) {
+  const url = `/guides/${g.slug}/`
+  const jsonld = [{
+    '@context': 'https://schema.org', '@type': 'Article',
+    headline: g.h1, description: g.description, datePublished: GUIDE_DATE, dateModified: TODAY,
+    author: { '@type': 'Person', name: OWNER, url: `${ORIGIN}/about/` },
+    publisher: { '@type': 'Organization', name: 'SnapFit', url: `${ORIGIN}/` },
+    mainEntityOfPage: `${ORIGIN}${url}`, inLanguage: 'en-IN',
+  }]
+  const body = `
+    <p style="color:var(--muted);font-size:14px;margin:-4px 0 20px">By <a href="/about/">${esc(OWNER)}</a> · Published ${GUIDE_DATE}</p>${g.body}
+    <p style="margin-top:28px"><a class="cta" href="${g.tool.href}">${esc(g.tool.label)} →</a></p>
+    ${GUIDE_LINKS}`
+  write(`guides/${g.slug}/index.html`, pageHtml({ url, title: `${g.title} | SnapFit`, description: g.description, h1: g.h1, crumbs: [{ name: 'Home', url: '/' }, { name: 'Guides', url: '/guides/' }, { name: g.h1, url }], jsonld, body, plain: true }))
+  return url
+}
+
+function guidesHubPage() {
+  const url = `/guides/`
+  const description = 'Practical, original guides from SnapFit: compress a photo to an exact KB, make a PDF smaller, make a QR code that scans, shoot white-background product photos, and keep your files private.'
+  const jsonld = [{
+    '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'SnapFit guides', url: `${ORIGIN}${url}`, description,
+  }]
+  const body = `
+    <p class="lede">Short, practical write-ups on the problems SnapFit's tools solve — written by the person who builds and maintains them. Each guide explains the "why" behind the numbers so you can fix a rejected upload yourself.</p>
+    ${GUIDES.map(g => `<h2 style="margin-top:30px"><a href="/guides/${g.slug}/" style="text-decoration:none">${esc(g.h1)}</a></h2>
+    <p>${esc(g.description)}</p>`).join('\n    ')}
+    <p style="margin-top:34px">Looking for exact sizes instead? See the <a href="/exam-photo-size-chart/">exam photo &amp; signature size chart</a>.</p>`
+  write(`guides/index.html`, pageHtml({ url, title: 'Guides — Photo, PDF & QR Code Help | SnapFit', description, h1: 'SnapFit guides', crumbs: [{ name: 'Home', url: '/' }, { name: 'Guides', url }], jsonld, body, plain: true }))
   return url
 }
 
@@ -626,7 +717,7 @@ const aboutPage = () => infoPage('about', 'About SnapFit', 'About SnapFit — Fr
     <p>Every exam portal wants something slightly different: 200×230 px and 10–200 KB for one form, 350×350 px and 20–300 KB for the next, a signature at 140×60 px for a third. Getting it wrong means a rejected upload at the worst possible moment — close to the deadline. The usual options are a trip to a cyber café, or a website that uploads your face and ID photo to its servers.</p>
     <p>SnapFit does the whole job on your own device. Pick your exam, upload a photo, and it is cropped to the right dimensions, the background cleaned to white and the file compressed into the allowed KB range in a few seconds.</p>
     <h2>Who makes it</h2>
-    <p>SnapFit is built and maintained by ${esc(OWNER)}, an independent software developer. It started as a tool to stop people losing time to photo-upload errors on exam forms, and has grown to cover ID photos, signatures and product photos for sellers on Amazon.in, Flipkart, Meesho and other marketplaces.</p>
+    <p>SnapFit is built and maintained by ${esc(OWNER)}, an independent software developer. It started as a tool to stop people losing time to photo-upload errors on exam forms, and has grown to cover ID photos, signatures and product photos for sellers on Amazon.in, Flipkart, Meesho and other marketplaces, plus a PDF compressor and a <a href="/qr-code-generator/">QR code generator</a> with logo support.</p>
     <h2>How it works</h2>
     <ul>
       <li><strong>On-device processing.</strong> Resizing, cropping, background removal and compression all run in your browser. The AI background-removal model is downloaded to your browser and runs locally; your photo is never sent to a server.</li>
@@ -703,7 +794,7 @@ function ogImage() {
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────────
-for (const d of ['exam', 'sell', 'compress', 'signature', 'photo-resizer', 'pan-card-photo-resizer', 'photo-resizer-in-pixels', 'exam-photo-size-chart', 'about', 'contact', 'privacy', 'terms'])
+for (const d of ['exam', 'sell', 'compress', 'signature', 'qr-code-generator', 'guides', 'photo-resizer', 'pan-card-photo-resizer', 'photo-resizer-in-pixels', 'exam-photo-size-chart', 'about', 'contact', 'privacy', 'terms'])
   rmSync(resolve(PUBLIC, d), { recursive: true, force: true })
 
 const urls = ['/']
@@ -713,6 +804,8 @@ for (const m of MARKETPLACE_PRESETS) urls.push(sellPage(m))
 for (const kb of KB_TARGETS) urls.push(kbPage(kb))
 for (const mb of MB_TARGETS) urls.push(mbPage(mb))
 urls.push(signaturePage())
+urls.push(qrPage())
+urls.push(guidesHubPage(), ...GUIDES.map(guidePage))
 urls.push(panCardPage())
 urls.push(pixelCmPage())
 urls.push(sizeChartPage())
@@ -735,7 +828,11 @@ const llms = `# SnapFit
 - [Photo resizer in pixels & cm](${ORIGIN}/photo-resizer-in-pixels/)
 - [PAN card photo resizer](${ORIGIN}/pan-card-photo-resizer/)
 - [Exam signature resizer](${ORIGIN}/signature/)
+- [Free QR code generator with logo — PNG & PDF download](${ORIGIN}/qr-code-generator/)
 - [Exam photo & signature size chart](${ORIGIN}/exam-photo-size-chart/)
+
+## Guides
+${GUIDES.map(g => `- [${g.h1}](${ORIGIN}/guides/${g.slug}/)`).join('\n')}
 
 ## Resize to an exact file size
 ${KB_TARGETS.map(kb => `- [Photo resizer to ${kb} KB](${ORIGIN}/compress/${kb}kb/)`).join('\n')}
@@ -749,4 +846,4 @@ ${MARKETPLACE_PRESETS.map(m => `- [${m.name} product photo — ${m.w}×${m.h}px,
 `
 writeFileSync(resolve(PUBLIC, 'llms.txt'), llms)
 
-console.log(`✓ SEO generated: ${urls.length - 1} pages (size chart, about, contact, privacy, terms, ${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, ${MB_TARGETS.length} MB, signature, PAN, pixel/cm, photo-resizer hub) + og-image + sitemap + robots + llms`)
+console.log(`✓ SEO generated: ${urls.length - 1} pages (size chart, about, contact, privacy, terms, ${EXAMS.length} exam, ${MARKETPLACE_PRESETS.length} marketplace, ${KB_TARGETS.length} KB, ${MB_TARGETS.length} MB, signature, QR, PAN, pixel/cm, photo-resizer hub) + og-image + sitemap + robots + llms`)

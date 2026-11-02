@@ -5,6 +5,7 @@ import { segmentSubject } from './segmentation'
 import { PRESETS, CUSTOM_BASE, BG_OPTIONS, MARKETPLACE_PRESETS } from './presets'
 import { extractSpecFromImage, specToPreset, BG_LABEL } from './extractSpec'
 import { AD_CLIENT, AD_SLOTS } from './adConfig'
+import QrScreen from './QrScreen'
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -553,10 +554,15 @@ const Ico = {
       <path d="M3.6 3.6h6l10.8 10.8a2 2 0 0 1 0 2.8l-3.2 3.2a2 2 0 0 1-2.8 0L3.6 9.6z" /><circle cx="7.5" cy="7.5" r="1.3" />
     </svg>
   ),
+  qr: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1" /><rect x="13.5" y="3.5" width="7" height="7" rx="1" /><rect x="3.5" y="13.5" width="7" height="7" rx="1" /><path d="M14 14h2.5v2.5H14zM19 14v.01M14 19.5v.01M17 19.5h3.5V17" />
+    </svg>
+  ),
 }
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
-function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenStudio }) {
+function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenQr, onOpenStudio }) {
   const stuck = useScrolled()
 
   return (
@@ -595,6 +601,11 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenStudio }
           Compress PDF
         </Btn>
 
+        <Btn onClick={onOpenQr} className="sf-hide-sm">
+          <Ico.qr width="15" height="15" />
+          QR code maker
+        </Btn>
+
         <Btn variant="sf-btn--primary" onClick={onUpload}>
           <Ico.upload width="15" height="15" />
           Upload photo
@@ -607,7 +618,7 @@ function Nav({ dark, onToggleDark, onUpload, onGoHome, onOpenPdf, onOpenStudio }
 // ─── Home Page ────────────────────────────────────────────────────────────────
 const HERO_WORDS = ['Exam', 'photo', '&', 'PDF,', 'sorted', 'in']
 
-function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, onOpenStudio, onAutoFill, noticeBusy, mode, onSetMode }) {
+function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, onOpenPdf, onOpenQr, onOpenStudio, onAutoFill, noticeBusy, mode, onSetMode }) {
   const [dragging, setDragging] = useState(false)
   const presetCount = useCountUp(20)
 
@@ -624,7 +635,7 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
         <div>
           <div className="sf-chip" style={{ color: 'var(--amber)', marginBottom: 20 }} data-reveal>
             <span className="sf-dot sf-dot--live" />
-            Photo fixer &amp; PDF compressor — free
+            Photo fixer, PDF compressor &amp; QR code maker — free
           </div>
 
           <h1 className="sf-h1">
@@ -641,23 +652,27 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
 
           <p className="sf-lede" data-reveal style={{ '--d': '260ms' }}>
             Resize exam photos for NEET, SSC, UPSC, IBPS, JEE and 20+ more exams — or shrink
-            any PDF to a fraction of its size. All in your browser, nothing uploaded, no sign-up.
+            any PDF to a fraction of its size, or turn your website link into a QR code with your logo. All in your browser, nothing uploaded, no sign-up.
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }} data-reveal>
-            <Btn variant="sf-btn--primary sf-btn--lg" onClick={onUpload}>
-              <Ico.upload width="18" height="18" />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }} data-reveal>
+            <Btn variant="sf-btn--primary sf-btn--md" onClick={onUpload}>
+              <Ico.upload width="16" height="16" />
               Fix exam photo
             </Btn>
-            <Btn variant="sf-btn--lg" onClick={onOpenPdf}>
-              <Ico.file width="18" height="18" />
+            <Btn variant="sf-btn--md" onClick={onOpenPdf}>
+              <Ico.file width="16" height="16" />
               Compress PDF
+            </Btn>
+            <Btn variant="sf-btn--md" onClick={onOpenQr}>
+              <Ico.qr width="16" height="16" />
+              Make QR code
             </Btn>
           </div>
 
           <p style={{ marginTop: 12, fontSize: 13, fontWeight: 600, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 7 }} data-reveal>
             <Ico.shield width="14" height="14" style={{ color: 'var(--green-ink)' }} />
-            JPG / PNG / PDF · 100% private · free forever
+            JPG / PNG / PDF / QR · 100% private · free forever
           </p>
 
           <div className="sf-stats" data-reveal style={{ '--d': '120ms' }}>
@@ -981,6 +996,8 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
               <a href="/pan-card-photo-resizer/">PAN card photo resizer</a>
               <a href="/signature/">Exam signature resizer</a>
               <a href="/exam-photo-size-chart/">Exam photo &amp; signature size chart</a>
+              <a href="/qr-code-generator/">QR code generator with logo</a>
+              <a href="/guides/">Guides: photo, PDF &amp; QR help</a>
             </div>
           </div>
         </div>
@@ -991,7 +1008,7 @@ function HomePage({ onUpload, onDrop, onDragOver, onDragLeave, onSelectPreset, o
           © 2026 SnapFit · Photos processed locally, never uploaded · Not affiliated with NTA, UPSC, SSC or any examination body.
         </div>
         <nav style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-          {[['/exam-photo-size-chart/', 'Exam photo size chart'], ['/about/', 'About'], ['/contact/', 'Contact'], ['/privacy/', 'Privacy policy'], ['/terms/', 'Terms']].map(([href, label]) => (
+          {[['/exam-photo-size-chart/', 'Exam photo size chart'], ['/guides/', 'Guides'], ['/about/', 'About'], ['/contact/', 'Contact'], ['/privacy/', 'Privacy policy'], ['/terms/', 'Terms']].map(([href, label]) => (
             <a key={href} href={href} style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--faint)' }}>{label}</a>
           ))}
         </nav>
@@ -1561,7 +1578,11 @@ function AdUnit({ slot, style }) {
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [screen,    setScreen]    = useState('home')
+  // /?tool=qr|pdf (linked from the landing pages and guides) opens that tool directly.
+  const [screen,    setScreen]    = useState(() => {
+    const t = new URLSearchParams(window.location.search).get('tool')
+    return t === 'qr' || t === 'pdf' ? t : 'home'
+  })
   const [dark,      setDark]      = useState(() => {
     const saved = localStorage.getItem('snapfit-theme')
     if (saved) return saved === 'dark'
@@ -1816,6 +1837,7 @@ export default function App() {
         onUpload={uploadExam}
         onGoHome={() => setScreen('home')}
         onOpenPdf={() => setScreen('pdf')}
+        onOpenQr={() => setScreen('qr')}
         onOpenStudio={openStudio}
       />
 
@@ -1827,6 +1849,7 @@ export default function App() {
           onDragLeave={e => e.preventDefault()}
           onSelectPreset={(p) => { toolRef.current = 'exam'; handleSelectPreset(p); openFile() }}
           onOpenPdf={() => setScreen('pdf')}
+          onOpenQr={() => setScreen('qr')}
           onOpenStudio={openStudio}
           onAutoFill={openNotice}
           noticeBusy={noticeState === 'reading'}
@@ -1901,6 +1924,10 @@ export default function App() {
 
       {screen === 'pdf' && (
         <PdfScreen onBack={() => setScreen('home')} />
+      )}
+
+      {screen === 'qr' && (
+        <QrScreen onBack={() => setScreen('home')} />
       )}
     </div>
   )

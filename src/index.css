@@ -279,6 +279,9 @@ h1, h2, h3, h4, .sf-display {
 .sf-btn--primary:hover::after { transform: translateX(120%); }
 
 .sf-btn--lg { min-height: 54px; padding: 16px 26px; font-size: 15.5px; border-radius: var(--r-md); }
+/* Compact hero size so the three tool buttons share one row. */
+.sf-btn--md { min-height: 48px; padding: 12px 16px; font-size: 14px; gap: 7px; border-radius: var(--r-md); white-space: nowrap; }
+@media (max-width: 480px) { .sf-btn--md { flex: 1 1 0; min-width: 0; padding: 12px 6px; font-size: 13px; } .sf-btn--md svg { display: none; } }
 
 .sf-btn--icon { width: 44px; height: 44px; padding: 0; }
 
