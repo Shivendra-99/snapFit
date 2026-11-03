@@ -1,15 +1,13 @@
 import { useState, useRef, useEffect, useCallback, Fragment } from 'react'
 import './index.css'
-import * as pdfjsLib from 'pdfjs-dist'
 import { segmentSubject } from './segmentation'
 import { PRESETS, CUSTOM_BASE, BG_OPTIONS, MARKETPLACE_PRESETS } from './presets'
 import { extractSpecFromImage, specToPreset, BG_LABEL } from './extractSpec'
 import { AD_CLIENT, AD_SLOTS } from './adConfig'
 import QrScreen from './QrScreen'
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).href
+const PDF_WORKER = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href
+// pdf.js is ~half the bundle — load it only when someone opens a PDF, so the home page paints fast.
+const loadPdfjs = () => import('pdfjs-dist').then(m => { m.GlobalWorkerOptions.workerSrc = PDF_WORKER; return m })
 
 function hexToRgb(h) {
   h = h.replace('#', '')
@@ -156,6 +154,7 @@ function PdfScreen({ onBack }) {
     setFileName(file.name)
     setOrigKb(Math.round(file.size / 1024))
     try {
+      const pdfjsLib = await loadPdfjs()
       const doc = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise
       docRef.current = doc
       setPdfDoc(doc)
